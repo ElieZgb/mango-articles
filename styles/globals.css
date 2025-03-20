@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Toledo Regular';
+  src: url('../public/assets/fonts/toledo-serial-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Helvetica Nueue Medium';
+  src: url('../public/assets/fonts/HelveticaNeueMedium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Helvetica Nueue Regular';
+  src: url('../public/assets/fonts/HelveticaNeueRoman.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Helvetica Nueue Light';
+  src: url('../public/assets/fonts/HelveticaNeueLight.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Helvetica Nueue Bold';
+  src: url('../public/assets/fonts/HelveticaNeueBold.otf') format('opentype');
+}
+
+@theme {
+  --color-background: #f5f4ee;
+  --color-black: #191919;
+  --color-mango: #fbccac;
+  --font-logo: "Toledo Regular";
+  --font-display-medium: "Helvetica Nueue Medium";
+  --font-display-regular: "Helvetica Nueue Regular";
+  --font-display-light: "Helvetica Nueue Light";
+  --font-display-bold: "Helvetica Nueue Bold";
+}
+
+*{
+  box-sizing: border-box;
+}
+
+body{
+  background-color: var(--color-background);
+  font-family: "Helvetica Nueue Regular", Helvetica, Arial, sans-serif;
+}
+
+.modal_box_shadow{
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 10px;
+}

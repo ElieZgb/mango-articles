@@ -1,0 +1,55 @@
+@keyframes modalFadeIn {
+  0%{
+    opacity: 0;
+  }
+
+  100%{
+    opacity: 1;
+  }
+}
+
+@keyframes modalFadeOut {
+  0%{
+    opacity: 1;
+  }
+
+  100%{
+    opacity: 0;
+  }
+}
+
+@keyframes modalContentFadeIn {
+  0%{
+    transform: scale(0.9);
+  }
+
+  100%{
+    transform: scale(1);
+  }
+}
+
+@keyframes modalContentFadeOut {
+  0%{
+    transform: scale(1);
+  }
+
+  100%{
+    transform: scale(0.9);
+  }
+}
+
+.modal_fade_in{
+  animation: 300ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards modalFadeIn;
+}
+
+.modal_fade_out{
+  animation: 300ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards modalFadeOut;
+}
+
+.modal_content_fade_in{
+  animation: 300ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards modalContentFadeIn;
+}
+
+.modal_content_fade_out{
+  animation: 300ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards modalContentFadeOut;
+}
