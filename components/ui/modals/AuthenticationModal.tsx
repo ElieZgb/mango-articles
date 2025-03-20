@@ -12,7 +12,7 @@ import AppleIcon from "@public/assets/icons/apple-icon.svg";
 
 import Image from "@node_modules/next/image";
 import type { StaticImport } from "@node_modules/next/dist/shared/lib/get-img-props";
-// import { signIn } from "@node_modules/next-auth/react";
+import { signIn } from "@node_modules/next-auth/react";
 // import { zodResolver } from "@node_modules/@hookform/resolvers/zod/dist";
 // import { signInSchema } from "@schema/signInSchema";
 
@@ -79,7 +79,9 @@ const LoginUI = ({
 		<div className="flex flex-col items-center w-[80%] mx-auto">
 			<h1 className="font-logo text-3xl mt-14 mb-16">Welcome Back.</h1>
 			<AuthProviderButton
-				onClick={() => {}}
+				onClick={() => {
+					signIn("google");
+				}}
 				label="Sign in with Google"
 				icon={GoogleIcon}
 			/>
