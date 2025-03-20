@@ -79,13 +79,7 @@ const LoginUI = ({
 		<div className="flex flex-col items-center w-[80%] mx-auto">
 			<h1 className="font-logo text-3xl mt-14 mb-16">Welcome Back.</h1>
 			<AuthProviderButton
-				onClick={async () => {
-					try {
-						await signIn("google", { callbackUrl: "/" });
-					} catch (e) {
-						console.log("Google Login Error:", e);
-					}
-				}}
+				onClick={() => {}}
 				label="Sign in with Google"
 				icon={GoogleIcon}
 			/>

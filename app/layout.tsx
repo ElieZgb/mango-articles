@@ -3,6 +3,7 @@ import "@styles/globals.css";
 import "@styles/animations.css";
 import Header from "@components/ui/Header";
 import Footer from "@components/ui/Footer";
+import AuthenticationModal from "@components/ui/modals/AuthenticationModal";
 
 export const metadata: Metadata = {
 	title: "Mango Articles",
@@ -17,6 +18,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body>
+				<AuthenticationModal />
 				<Header />
 				{children}
 				<Footer />
