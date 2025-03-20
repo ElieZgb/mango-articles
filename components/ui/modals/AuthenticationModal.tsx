@@ -6,7 +6,7 @@ import CloseButton from "../buttons/CloseButton";
 
 import FacebookIcon from "@public/assets/icons/facebook-icon.svg";
 import GoogleIcon from "@public/assets/icons/google-icon.svg";
-import XIcon from "@public/assets/icons/X-icon.svg";
+import XIcon from "@public/assets/icons/x-icon.svg";
 import EmailIcon from "@public/assets/icons/email-icon.svg";
 import AppleIcon from "@public/assets/icons/apple-icon.svg";
 
