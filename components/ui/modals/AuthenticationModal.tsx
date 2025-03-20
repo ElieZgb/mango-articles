@@ -12,7 +12,7 @@ import AppleIcon from "@public/assets/icons/apple-icon.svg";
 
 import Image from "@node_modules/next/image";
 import type { StaticImport } from "@node_modules/next/dist/shared/lib/get-img-props";
-import { signIn } from "@node_modules/next-auth/react";
+// import { signIn } from "@node_modules/next-auth/react";
 // import { zodResolver } from "@node_modules/@hookform/resolvers/zod/dist";
 // import { signInSchema } from "@schema/signInSchema";
 
