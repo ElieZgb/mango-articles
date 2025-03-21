@@ -1,4 +1,4 @@
-import { PrismaClient } from "@node_modules/@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 declare global {
 	// eslint-disable-next-line no-var
@@ -16,4 +16,4 @@ if (process.env.NODE_ENV === "production") {
 	prisma = global.prisma;
 }
 
-export default prisma;
+export const db = prisma;

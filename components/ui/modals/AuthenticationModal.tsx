@@ -1,33 +1,36 @@
 "use client";
 import React, { useState, useEffect } from "react";
-// import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import clsx from "clsx";
 import CloseButton from "../buttons/CloseButton";
 
 import FacebookIcon from "@public/assets/icons/facebook-icon.svg";
 import GoogleIcon from "@public/assets/icons/google-icon.svg";
-import XIcon from "@public/assets/icons/x-icon.svg";
-import EmailIcon from "@public/assets/icons/email-icon.svg";
-import AppleIcon from "@public/assets/icons/apple-icon.svg";
+// import XIcon from "@public/assets/icons/x-icon.svg";
+// import EmailIcon from "@public/assets/icons/email-icon.svg";
+// import AppleIcon from "@public/assets/icons/apple-icon.svg";
 
 import Image from "@node_modules/next/image";
 import type { StaticImport } from "@node_modules/next/dist/shared/lib/get-img-props";
 import { signIn } from "@node_modules/next-auth/react";
-// import { zodResolver } from "@node_modules/@hookform/resolvers/zod/dist";
-// import { signInSchema } from "@schema/signInSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ModalState, useModalsState } from "@state/modals";
+import { useRouter } from "@node_modules/next/navigation";
+import { signInSchema, SignInSchema } from "@schema/signInSchema";
+import { SignUpSchema, signUpSchema } from "@schema/signUpSchema";
 
 export default function AuthenticationModal() {
-	const [active, setActive] = useState(true);
-	const [hidden, setHidden] = useState(false);
-	const [isLoginForm, setIsLoginForm] = useState(true);
-	// const {} = useForm({
-	// 	resolver: zodResolver(signInSchema),
-	// });
+	const [hidden, setHidden] = useState(true);
+	const { data: modalState, setData: setModalData } = useModalsState();
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		if (modalState?.isOpen) {
+			setHidden(false);
+		}
+	}, [modalState]);
 
 	const closeModal = () => {
-		setActive(false);
+		setModalData({ ...modalState, isOpen: false });
 		setTimeout(() => {
 			setHidden(true);
 		}, 500);
@@ -41,8 +44,8 @@ export default function AuthenticationModal() {
 		<div
 			className={clsx([
 				"absolute w-[100vw] h-[100vh] bg-[#ffffffea] top-0 left-0 flex justify-center items-center",
-				active && "modal_fade_in z-50",
-				!active && "modal_fade_out -z-50",
+				modalState?.isOpen && "modal_fade_in z-50",
+				!modalState?.isOpen && "modal_fade_out -z-50",
 			])}
 		>
 			<div
@@ -52,18 +55,24 @@ export default function AuthenticationModal() {
 			<div
 				className={clsx([
 					"relative w-[70%] max-w-[678px] bg-white modal_box_shadow",
-					active && "modal_content_fade_in",
-					!active && "modal_content_fade_out",
+					modalState?.isOpen && "modal_content_fade_in",
+					!modalState?.isOpen && "modal_content_fade_out",
 				])}
 			>
 				<CloseButton
 					closeModal={closeModal}
 					className="cursor-pointer absolute top-4 right-4"
 				/>
-				{isLoginForm ? (
-					<LoginUI setIsLoginForm={setIsLoginForm} />
+				{modalState?.type == 1 ? (
+					<LoginUI
+						setModalData={setModalData}
+						title={modalState?.title}
+					/>
 				) : (
-					<RegisterUI setIsLoginForm={setIsLoginForm} />
+					<RegisterUI
+						setModalData={setModalData}
+						title={modalState?.title}
+					/>
 				)}
 			</div>
 		</div>
@@ -71,13 +80,50 @@ export default function AuthenticationModal() {
 }
 
 const LoginUI = ({
-	setIsLoginForm,
+	setModalData,
+	title,
 }: {
-	setIsLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
+	setModalData: (data: Partial<ModalState>) => void;
+	title: string | null | undefined;
 }) => {
+	const { handleSubmit, register } = useForm<SignInSchema>({
+		resolver: zodResolver(signInSchema),
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
+	const router = useRouter();
+
+	const onSubmit = async (data: SignInSchema) => {
+		console.log(data);
+
+		try {
+			const account = await signIn("credentials", {
+				email: data.email,
+				password: data.password,
+				redirect: false,
+			});
+
+			if (!account) throw new Error("Something went wrong");
+
+			if (account.error == "CredentialsSignin") {
+				console.log("Wrong credentials");
+			} else {
+				console.log("You are signed in!");
+				router.push("/");
+				setModalData({ isOpen: false });
+			}
+		} catch (e) {
+			console.log("Error", e);
+		}
+	};
+
 	return (
 		<div className="flex flex-col items-center w-[80%] mx-auto">
-			<h1 className="font-logo text-3xl mt-14 mb-16">Welcome Back.</h1>
+			<h1 className="font-logo text-3xl mt-14 mb-16">
+				{title ? title : "Welcome Back."}
+			</h1>
 			<AuthProviderButton
 				onClick={() => {
 					signIn("google");
@@ -86,29 +132,40 @@ const LoginUI = ({
 				icon={GoogleIcon}
 			/>
 			<AuthProviderButton
-				onClick={() => {}}
+				onClick={() => {
+					signIn("facebook");
+				}}
 				label="Sign in with Facebook"
 				icon={FacebookIcon}
 			/>
-			<AuthProviderButton
-				onClick={() => {}}
-				label="Sign in with Apple"
-				icon={AppleIcon}
-			/>
-			<AuthProviderButton
-				onClick={() => {}}
-				label="Sign in with X"
-				icon={XIcon}
-			/>
-			<AuthProviderButton
-				onClick={() => {}}
-				label="Sign in with Email"
-				icon={EmailIcon}
-			/>
+			<div className="w-full max-w-[300px] mb-3 border-t-[1px] border-black border-dashed" />
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				className="flex flex-col w-full max-w-[300px]"
+			>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("email")}
+					type="email"
+					placeholder="Email"
+				/>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("password")}
+					type="password"
+					placeholder="Password"
+				/>
+				<input
+					type="submit"
+					value="Sign in"
+					className="py-1 px-3 outline-none mb-3 rounded-full bg-mango cursor-pointer"
+				/>
+			</form>
+
 			<p className="mt-9 mb-12">
 				No account?{" "}
 				<button
-					onClick={() => setIsLoginForm(false)}
+					onClick={() => setModalData({ isOpen: true, type: 2 })}
 					className="text-mango font-display-bold cursor-pointer"
 				>
 					Create one
@@ -127,32 +184,113 @@ const LoginUI = ({
 };
 
 const RegisterUI = ({
-	setIsLoginForm,
+	setModalData,
+	title,
 }: {
-	setIsLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
+	setModalData: (data: Partial<ModalState>) => void;
+	title: string | null | undefined;
 }) => {
+	const { handleSubmit, register } = useForm<SignUpSchema>({
+		resolver: zodResolver(signUpSchema),
+		defaultValues: {
+			email: "",
+			password: "",
+			confirm_password: "",
+			name: "",
+		},
+	});
+	const router = useRouter();
+
+	const onSubmit = async (data: SignUpSchema) => {
+		if (data.password !== data.confirm_password)
+			return console.log("Password missmatch");
+
+		try {
+			const res = await fetch("/api/auth/register", {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			console.log({ text: res.statusText, status: res.status });
+			if (!res.ok) throw new Error("Something went wrong: RES.OK");
+
+			const signUpInfo = await res.json();
+
+			if (res.status === 200) {
+				await signIn("credentials", {
+					email: data.email,
+					password: data.password,
+					redirect: false,
+				});
+				router.push("/");
+				setModalData({ isOpen: false });
+			} else throw new Error(signUpInfo);
+		} catch (e) {
+			console.log("Error signing up", e);
+		}
+	};
+
 	return (
 		<div className="flex flex-col items-center w-[80%] mx-auto">
-			<h1 className="font-logo text-3xl mt-14 mb-16">Join Medium.</h1>
+			<h1 className="font-logo text-3xl mt-14 mb-16">
+				{title ? title : "Join Medium."}
+			</h1>
 			<AuthProviderButton
-				onClick={() => {}}
+				onClick={() => {
+					signIn("google");
+				}}
 				label="Sign up with Google"
 				icon={GoogleIcon}
 			/>
 			<AuthProviderButton
-				onClick={() => {}}
+				onClick={() => {
+					signIn("facebook");
+				}}
 				label="Sign up with Facebook"
 				icon={FacebookIcon}
 			/>
-			<AuthProviderButton
-				onClick={() => {}}
-				label="Sign up with Email"
-				icon={EmailIcon}
-			/>
+			<div className="w-full max-w-[300px] mb-3 border-t-[1px] border-black border-dashed" />
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				className="flex flex-col w-full max-w-[300px]"
+			>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("name")}
+					type="text"
+					placeholder="Full Name"
+				/>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("email")}
+					type="email"
+					placeholder="Email"
+				/>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("password")}
+					type="password"
+					placeholder="Password"
+				/>
+				<input
+					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					{...register("confirm_password")}
+					type="password"
+					placeholder="Confirm Password"
+				/>
+				<input
+					type="submit"
+					value="Sign Up"
+					className="py-1 px-3 outline-none mb-3 rounded-full bg-mango cursor-pointer"
+				/>
+			</form>
 			<p className="mt-9 mb-28">
 				Already have an account?{" "}
 				<button
-					onClick={() => setIsLoginForm(true)}
+					onClick={() => setModalData({ isOpen: true, type: 1 })}
 					className="text-mango font-display-bold cursor-pointer"
 				>
 					Sign in
@@ -178,7 +316,7 @@ const AuthProviderButton = ({
 	return (
 		<div
 			onClick={onClick}
-			className="relative py-2 mb-3 w-full max-w-[300px] rounded-full text-center shrink-0 border-black border-[1px]"
+			className="relative py-2 mb-3 w-full max-w-[300px] rounded-full text-center shrink-0 border-black border-[1px] cursor-pointer"
 		>
 			<Image
 				src={icon}

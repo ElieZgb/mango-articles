@@ -4,26 +4,52 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-}
-
-model Post {
-  id        String  @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
+  url       = env("POSTGRES_PRISMA_URL") // Set this in your .env file
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(uuid())
+  email     String?   @unique // Nullable to support social logins
+  password  String? // Nullable for social logins
   name      String?
-  email     String?  @unique
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-  posts     Post[]
+  image     String? // Profile picture
+  accounts  Account[] // One user can have multiple auth methods
+  sessions  Session[] // JWT-based sessions
+  articles  Article[] // One-to-many relation (User writes articles)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
 
-  @@map(name: "users")
+model Account {
+  id                String  @id @default(uuid())
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  provider          String // e.g., "google", "facebook", "credentials"
+  providerAccountId String? @unique // Unique ID from provider (null for email/password)
+  access_token      String? // OAuth access token (optional)
+  refresh_token     String? // OAuth refresh token (optional)
+  expires_at        Int? // Token expiration timestamp
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  token     String   @unique // JWT token
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Article {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  published Boolean  @default(false) // Draft or Published
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
