@@ -1,6 +1,7 @@
 import Image from "@node_modules/next/image";
 import React from "react";
 import MangoPreview from "@public/assets/images/mango-bg.png";
+import Link from "@node_modules/next/link";
 
 export default function page() {
 	return (
@@ -22,9 +23,12 @@ export default function page() {
 				<p className="text-2xl">
 					A place to read, write, and deepen your understanding
 				</p>
-				<button className="w-fit text-xl bg-black px-11 py-2.5 rounded-full cursor-pointer text-white flex items-center justify-center transition-all hover:bg-mango hover:text-black">
+				<Link
+					href="/feed"
+					className="w-fit text-xl bg-black px-11 py-2.5 rounded-full cursor-pointer text-white flex items-center justify-center transition-all hover:bg-mango hover:text-black"
+				>
 					Start reading
-				</button>
+				</Link>
 			</div>
 		</div>
 	);

@@ -28,6 +28,7 @@ export async function POST(request: Request) {
 				email,
 				password: hashedPassword,
 				name,
+				image: `${process.env.ImageKit_URL_ENDPOINT}/profile-placeholder`,
 			},
 		});
 
