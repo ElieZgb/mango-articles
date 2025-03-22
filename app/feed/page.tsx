@@ -1,5 +1,4 @@
 "use client";
-import { ArticlesApiType } from "@app/api/articles/route";
 import ArticleFeedCard from "@components/ui/cards/ArticleFeedCard";
 import ArticleFeedCardSkeleton from "@components/ui/cards/ArticleFeedCardSkeleton";
 import type { User } from "@node_modules/@prisma/client";
@@ -17,7 +16,7 @@ interface DataState {
 	author: User;
 }
 
-export default function page() {
+export default function Page() {
 	const [data, setData] = useState<DataState[] | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
