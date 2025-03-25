@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const { email, password, name } = result.data;
+	const { email, password, name, username } = result.data;
 
 	try {
 		const existedEmail = await db.user.findUnique({ where: { email } });
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
 				password: hashedPassword,
 				name,
 				image: `${process.env.ImageKit_URL_ENDPOINT}/profile-placeholder`,
+				username,
 			},
 		});
 

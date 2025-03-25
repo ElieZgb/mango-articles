@@ -7,6 +7,7 @@ export const signUpSchema = z.object({
 		.string()
 		.min(8, "Password must be at least 8 characters"),
 	name: z.string().min(3, "Minimum 3 letters"),
+	username: z.string().min(3, "Minimum 3 letters"),
 });
 
 export type SignUpSchema = z.infer<typeof signUpSchema>;

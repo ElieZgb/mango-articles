@@ -7,6 +7,7 @@ import { getServerSession } from "@node_modules/next-auth";
 import AuthenticationModal from "@components/ui/modals/AuthenticationModal";
 import SessionProvider from "@providers/SessionProvider";
 import TanstackProvider from "@providers/TanstackProvider";
+import PopupModal from "@components/ui/modals/PopupModal";
 
 export const metadata: Metadata = {
 	title: "Mango Articles",
@@ -26,6 +27,7 @@ export default async function RootLayout({
 				<TanstackProvider>
 					<SessionProvider session={session}>
 						<AuthenticationModal />
+						<PopupModal />
 						<Header />
 						{children}
 						<Footer />

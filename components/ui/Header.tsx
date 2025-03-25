@@ -1,17 +1,43 @@
 "use client";
-import React from "react";
-import { useSession } from "@node_modules/next-auth/react";
+import React, { useEffect, useState } from "react";
+import { signOut, useSession } from "@node_modules/next-auth/react";
 import { useModalsState } from "@state/modals";
 import ProfileButton from "./buttons/ProfileButton";
 import Link from "@node_modules/next/link";
+import { usePopupState } from "@state/popups";
 
 export default function Header() {
 	const { data: session } = useSession();
 	const { setData: setModalData } = useModalsState();
+	const { setData: setPopupData } = usePopupState();
+	const [doneFetching, setDoneFetching] = useState<boolean>(false);
 
 	const openModal = (type: number) => {
 		setModalData({ isOpen: true, type });
 	};
+
+	useEffect(() => {
+		if (session?.user) {
+			if (doneFetching) return;
+
+			const fetchAndUpdateUser = async () => {
+				const userFetchResponse = await fetch("/api/users", {
+					method: "POST",
+					body: JSON.stringify({ email: session.user.email }),
+				});
+
+				if (!userFetchResponse.ok) return signOut();
+
+				const user = await userFetchResponse.json();
+
+				if (user.username) return setDoneFetching(true);
+
+				setPopupData({ isOpen: true, email: user.email });
+			};
+
+			fetchAndUpdateUser();
+		}
+	}, [session]);
 
 	const handleWritePage = () => {
 		if (!session?.user?.email) {

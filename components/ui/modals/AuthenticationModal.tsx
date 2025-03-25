@@ -16,8 +16,10 @@ import { signIn } from "@node_modules/next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ModalState, useModalsState } from "@state/modals";
 import { useRouter } from "@node_modules/next/navigation";
-import { signInSchema, SignInSchema } from "@schema/signInSchema";
-import { SignUpSchema, signUpSchema } from "@schema/signUpSchema";
+import { signInSchema, type SignInSchema } from "@schema/signInSchema";
+import { type SignUpSchema, signUpSchema } from "@schema/signUpSchema";
+import { checkUsernameAvailability } from "@lib/checkUsernameAvailability";
+import { Loader2, CircleCheck, XCircle } from "lucide-react";
 
 export default function AuthenticationModal() {
 	const [hidden, setHidden] = useState(true);
@@ -79,13 +81,12 @@ export default function AuthenticationModal() {
 	);
 }
 
-const LoginUI = ({
-	setModalData,
-	title,
-}: {
+interface FormProps {
 	setModalData: (data: Partial<ModalState>) => void;
 	title: string | null | undefined;
-}) => {
+}
+
+const LoginUI = ({ setModalData, title }: FormProps) => {
 	const { handleSubmit, register } = useForm<SignInSchema>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -96,8 +97,6 @@ const LoginUI = ({
 	const router = useRouter();
 
 	const onSubmit = async (data: SignInSchema) => {
-		console.log(data);
-
 		try {
 			const account = await signIn("credentials", {
 				email: data.email,
@@ -183,27 +182,55 @@ const LoginUI = ({
 	);
 };
 
-const RegisterUI = ({
-	setModalData,
-	title,
-}: {
-	setModalData: (data: Partial<ModalState>) => void;
-	title: string | null | undefined;
-}) => {
-	const { handleSubmit, register } = useForm<SignUpSchema>({
+const RegisterUI = ({ setModalData, title }: FormProps) => {
+	const [loading, setLoading] = useState<boolean>(false);
+	const [success, setSuccess] = useState<boolean | null>(null);
+	const {
+		handleSubmit,
+		watch,
+		register,
+		setError,
+		clearErrors,
+		formState: { errors },
+	} = useForm<SignUpSchema>({
 		resolver: zodResolver(signUpSchema),
 		defaultValues: {
 			email: "",
 			password: "",
 			confirm_password: "",
 			name: "",
+			username: "",
 		},
 	});
 	const router = useRouter();
+	const usernameInput = watch("username");
+
+	useEffect(() => {
+		setLoading(false);
+		setSuccess(null);
+		if (!usernameInput.trim()) return;
+
+		const timeout = setTimeout(() => {
+			setLoading(true);
+			checkUsernameAvailability(usernameInput).then((isAvailable) => {
+				setSuccess(isAvailable);
+				setLoading(false);
+			});
+		}, 800);
+
+		return () => clearTimeout(timeout);
+	}, [usernameInput]);
 
 	const onSubmit = async (data: SignUpSchema) => {
-		if (data.password !== data.confirm_password)
+		if (!success) return;
+		if (data.password !== data.confirm_password) {
+			setError(
+				"confirm_password",
+				{ message: "Passwords do not match!" },
+				{ shouldFocus: true }
+			);
 			return console.log("Password missmatch");
+		}
 
 		try {
 			const res = await fetch("/api/auth/register", {
@@ -214,8 +241,8 @@ const RegisterUI = ({
 				},
 			});
 
-			console.log({ text: res.statusText, status: res.status });
-			if (!res.ok) throw new Error("Something went wrong: RES.OK");
+			if (!res.ok)
+				throw new Error(`Something went wrong: ${res.statusText}`);
 
 			const signUpInfo = await res.json();
 
@@ -263,6 +290,41 @@ const RegisterUI = ({
 					type="text"
 					placeholder="Full Name"
 				/>
+				<div
+					className={clsx(
+						"relative mb-3 border-[1px] rounded-full",
+						success && "border-green-500",
+						success == false && "border-red-500"
+					)}
+				>
+					<input
+						className="w-full py-1 px-3 outline-none"
+						{...register("username")}
+						type="text"
+						placeholder="Username"
+					/>
+					<Loader2
+						size={20}
+						className={`absolute top-[50%] translate-y-[-50%] right-2 animate-spin invisible ${
+							loading && "visible"
+						}`}
+						color="#191919"
+					/>
+					<CircleCheck
+						size={20}
+						className={`absolute top-[50%] translate-y-[-50%] right-2 invisible ${
+							success && "visible"
+						}`}
+						color="oklch(0.723 0.219 149.579)"
+					/>
+					<XCircle
+						size={20}
+						className={`absolute top-[50%] translate-y-[-50%] right-2 invisible ${
+							success == false && "visible"
+						}`}
+						color="#fb2c36"
+					/>
+				</div>
 				<input
 					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
 					{...register("email")}
@@ -270,16 +332,22 @@ const RegisterUI = ({
 					placeholder="Email"
 				/>
 				<input
-					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					className={clsx(
+						"border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					)}
 					{...register("password")}
 					type="password"
 					placeholder="Password"
 				/>
 				<input
-					className="border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full"
+					className={clsx(
+						"border-[1px] border-black py-1 px-3 outline-none mb-3 rounded-full",
+						errors.confirm_password && "border-red-500"
+					)}
 					{...register("confirm_password")}
 					type="password"
 					placeholder="Confirm Password"
+					onChange={() => clearErrors("confirm_password")}
 				/>
 				<input
 					type="submit"
@@ -287,7 +355,7 @@ const RegisterUI = ({
 					className="py-1 px-3 outline-none mb-3 rounded-full bg-mango cursor-pointer"
 				/>
 			</form>
-			<p className="mt-9 mb-28">
+			<p className="mt-9 mb-12">
 				Already have an account?{" "}
 				<button
 					onClick={() => setModalData({ isOpen: true, type: 1 })}
