@@ -3,6 +3,7 @@ import type { User } from "@node_modules/@prisma/client";
 import Image from "@node_modules/next/image";
 import React from "react";
 import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
+import Link from "@node_modules/next/link";
 
 type AsideCardProps = {
 	author: User;
@@ -10,6 +11,7 @@ type AsideCardProps = {
 	content: string;
 	updatedAt: Date;
 	likes_count: number;
+	slug: string;
 };
 
 export default function AsideCard({
@@ -18,6 +20,7 @@ export default function AsideCard({
 	content,
 	updatedAt,
 	likes_count,
+	slug,
 }: AsideCardProps) {
 	return (
 		<div className="mb-5 flex relative rounded-lg overflow-hidden bg-white border-black border-[1px]">
@@ -36,14 +39,16 @@ export default function AsideCard({
 					</h3>
 				</div>
 
-				<div className="py-2">
-					<h3 className="text-lg font-display-bold text-gray-800 line-clamp-1">
-						{title}
-					</h3>
-					<p className="text-sm text-gray-800 line-clamp-2">
-						{content}
-					</p>
-				</div>
+				<Link href={`/article/${slug}`} className="py-2 block">
+					<div className="">
+						<h3 className="text-lg font-display-bold text-gray-800 line-clamp-1">
+							{title}
+						</h3>
+						<p className="text-sm text-gray-800 line-clamp-2">
+							{content}
+						</p>
+					</div>
+				</Link>
 
 				<div className="flex items-center gap-4 text-sm text-gray-700">
 					<span>{formatTimeAgo(updatedAt)}</span>{" "}

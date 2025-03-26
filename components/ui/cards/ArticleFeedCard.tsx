@@ -4,6 +4,7 @@ import type { User } from "@node_modules/.prisma/client";
 import Image from "@node_modules/next/image";
 import React from "react";
 import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
+import Link from "@node_modules/next/link";
 
 interface ArticleFeedCardProps {
 	title: string;
@@ -12,6 +13,7 @@ interface ArticleFeedCardProps {
 	updatedAt: Date;
 	author: User;
 	image: string | null;
+	slug: string;
 }
 
 export default function ArticleFeedCard({
@@ -21,6 +23,7 @@ export default function ArticleFeedCard({
 	likes,
 	updatedAt,
 	image,
+	slug,
 }: ArticleFeedCardProps) {
 	return (
 		<div className="mb-5 flex max-w-[1000px] relative rounded-lg overflow-hidden bg-white shadow-lg">
@@ -40,14 +43,16 @@ export default function ArticleFeedCard({
 					</h3>
 				</div>
 
-				<div className="py-3">
-					<h3 className="mb-2 text-2xl font-display-bold text-gray-800 line-clamp-2">
-						{title}
-					</h3>
-					<p className="text-sm text-gray-800">
-						{content.slice(0, 200)}...
-					</p>
-				</div>
+				<Link href={`/article/${slug}`} className="py-3 block">
+					<div className="">
+						<h3 className="mb-2 text-2xl font-display-bold text-gray-800 line-clamp-2">
+							{title}
+						</h3>
+						<p className="text-sm text-gray-800">
+							{content.slice(0, 200)}...
+						</p>
+					</div>
+				</Link>
 
 				<div className="flex items-center gap-4 text-sm text-gray-700">
 					<span>{formatTimeAgo(updatedAt)}</span>{" "}

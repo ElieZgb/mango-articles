@@ -116,8 +116,8 @@ export const authOptions: AuthOptions = {
 			};
 		},
 		async signIn({ account, user }) {
-			console.log("Account:", account);
-			console.log("User:", user);
+			// console.log("Account:", account);
+			// console.log("User:", user);
 
 			if (user.email && account) {
 				const existingUser = await prisma.user.findUnique({
@@ -171,6 +171,9 @@ export const authOptions: AuthOptions = {
 			}
 
 			return false; // user.email is missing
+		},
+		async redirect() {
+			return "/";
 		},
 	},
 };

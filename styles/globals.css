@@ -25,6 +25,11 @@
   src: url('../public/assets/fonts/HelveticaNeueBold.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'Helvetica Nueue Black';
+  src: url('../public/assets/fonts/HelveticaNeueBlack.otf') format('opentype');
+}
+
 @theme {
   --color-background: #f5f4ee;
   --color-black: #191919;
@@ -34,6 +39,7 @@
   --font-display-regular: "Helvetica Nueue Regular";
   --font-display-light: "Helvetica Nueue Light";
   --font-display-bold: "Helvetica Nueue Bold";
+  --font-display-black: "Helvetica Nueue Black";
 }
 
 *{

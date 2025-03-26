@@ -24,7 +24,7 @@ export default function page() {
 					A place to read, write, and deepen your understanding
 				</p>
 				<Link
-					href="/feed"
+					href="/articles"
 					className="w-fit text-xl bg-black px-11 py-2.5 rounded-full cursor-pointer text-white flex items-center justify-center transition-all hover:bg-mango hover:text-black"
 				>
 					Start reading

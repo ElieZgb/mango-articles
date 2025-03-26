@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import type { User } from "@node_modules/@prisma/client";
 import AsideCard from "@components/ui/cards/AsideCard";
 import AsideCardSkeleton from "@components/ui/cards/AsideCardSkeleton";
+import { slugify } from "@lib/slugify";
 
 interface DataState {
 	title: string;
@@ -56,6 +57,7 @@ export default function FeedAside() {
 						likes_count={article.likes_count}
 						updatedAt={article.updatedAt}
 						author={article.author}
+						slug={slugify(article.title, article.id)}
 					/>
 				);
 			})}

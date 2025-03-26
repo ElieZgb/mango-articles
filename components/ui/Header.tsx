@@ -50,13 +50,13 @@ export default function Header() {
 	};
 
 	return (
-		<div className="flex justify-center border-b-[1px] border-b-black">
+		<div className="flex justify-center border-b-[1px] border-b-black sticky top-0 bg-background z-20">
 			<div className="mx-16 max-w-[1192px] w-full py-5 flex justify-between">
 				<h1 className="font-logo text-3xl">
 					<Link href="/">MangoArticles</Link>
 				</h1>
 				<div className="flex items-center gap-6 text-sm">
-					<Link href="/feed">Articles</Link>
+					<Link href="/articles">Articles</Link>
 					<div onClick={handleWritePage} className="cursor-pointer">
 						Write
 					</div>

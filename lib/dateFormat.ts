@@ -1,3 +1,18 @@
+const MONTHS = [
+	{ short: "Jan", full: "January" },
+	{ short: "Feb", full: "February" },
+	{ short: "Mar", full: "March" },
+	{ short: "Apr", full: "April" },
+	{ short: "May", full: "May" },
+	{ short: "Jun", full: "June" },
+	{ short: "Jul", full: "July" },
+	{ short: "Aug", full: "August" },
+	{ short: "Sep", full: "September" },
+	{ short: "Oct", full: "October" },
+	{ short: "Nov", full: "November" },
+	{ short: "Dec", full: "December" },
+];
+
 export function formatTimeAgo(date: string | Date): string {
 	const now = new Date();
 	const parsedDate = typeof date === "string" ? new Date(date) : date; // Convert if string
@@ -15,4 +30,14 @@ export function formatTimeAgo(date: string | Date): string {
 
 	const diffWeeks = Math.floor(diffDays / 7);
 	return `${diffWeeks}w ago`;
+}
+
+export function formatDate(date: string | Date): string {
+	const parsedDate = typeof date === "string" ? new Date(date) : date;
+
+	const day = parsedDate.getDate();
+	const month = MONTHS[parsedDate.getMonth()].short;
+	const year = parsedDate.getFullYear();
+
+	return `${month} ${day}, ${year}`;
 }

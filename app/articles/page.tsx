@@ -1,6 +1,7 @@
 "use client";
 import ArticleFeedCard from "@components/ui/cards/ArticleFeedCard";
 import ArticleFeedCardSkeleton from "@components/ui/cards/ArticleFeedCardSkeleton";
+import { slugify } from "@lib/slugify";
 import type { User } from "@node_modules/@prisma/client";
 import React, { useEffect, useState } from "react";
 
@@ -55,6 +56,7 @@ export default function Page() {
 						title={article.title}
 						author={article.author}
 						image={article.header_image}
+						slug={slugify(article.title, article.id)}
 					/>
 				);
 			})}
