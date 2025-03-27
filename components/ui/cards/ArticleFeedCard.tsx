@@ -38,14 +38,17 @@ export default function ArticleFeedCard({
 							className="rounded-full object-cover"
 						/>
 					</div>
-					<h3 className={`text-sm text-gray-800 pt-1`}>
+					<Link
+						href={`/${author.username}`}
+						className={`text-sm text-gray-800 pt-1 hover:underline`}
+					>
 						{author.name}
-					</h3>
+					</Link>
 				</div>
 
-				<Link href={`/article/${slug}`} className="py-3 block">
+				<Link href={`/article/${slug}`} className="py-3 block group">
 					<div className="">
-						<h3 className="mb-2 text-2xl font-display-bold text-gray-800 line-clamp-2">
+						<h3 className="mb-2 text-2xl font-display-bold text-gray-800 line-clamp-2 group-hover:underline">
 							{title}
 						</h3>
 						<p className="text-sm text-gray-800">

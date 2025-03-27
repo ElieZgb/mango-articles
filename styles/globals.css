@@ -49,6 +49,7 @@
 body{
   background-color: var(--color-background);
   font-family: "Helvetica Nueue Regular", Helvetica, Arial, sans-serif;
+  color: var(--color-black)
 }
 
 .modal_box_shadow{

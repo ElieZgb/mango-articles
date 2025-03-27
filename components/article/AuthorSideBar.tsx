@@ -36,7 +36,11 @@ export default function AuthorSideBar({ author }: { author: User }) {
 		<div className="sticky top-22 self-start max-w-[200px] w-full">
 			{/* author details  */}
 			<div className="bg-white p-4 rounded-sm">
-				<div className="flex items-center gap-[6px] mb-3">
+				<div className="flex items-center gap-[6px] mb-3 relative">
+					<Link
+						href={`/${author.username}`}
+						className="absolute top-0 left-0 w-full h-full"
+					/>
 					<div className="w-10 h-10 rounded-full bg-red-300 relative overflow-hidden">
 						<Image
 							src={author.image || ProfilePlaceholder}
@@ -56,10 +60,7 @@ export default function AuthorSideBar({ author }: { author: User }) {
 				</div>
 
 				<div className="text-xs leading-3.5">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit.
-					Assumenda, odit quis consequuntur perferendis ullam eum
-					dolores excepturi dolorum quos rem expedita impedit iure
-					nulla architecto enim vel numquam repudiandae ducimus.
+					{author.bio || "No bio yet."}
 				</div>
 
 				{authorArticles.length > 0 && (

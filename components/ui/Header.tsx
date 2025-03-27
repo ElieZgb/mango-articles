@@ -11,6 +11,7 @@ export default function Header() {
 	const { setData: setModalData } = useModalsState();
 	const { setData: setPopupData } = usePopupState();
 	const [doneFetching, setDoneFetching] = useState<boolean>(false);
+	const [username, setUsername] = useState<string | null>(null);
 
 	const openModal = (type: number) => {
 		setModalData({ isOpen: true, type });
@@ -30,7 +31,11 @@ export default function Header() {
 
 				const user = await userFetchResponse.json();
 
-				if (user.username) return setDoneFetching(true);
+				if (user.username) {
+					setDoneFetching(true);
+					setUsername(user.username);
+					return;
+				}
 
 				setPopupData({ isOpen: true, email: user.email });
 			};
@@ -76,7 +81,9 @@ export default function Header() {
 							</div>
 						</>
 					)}
-					{session?.user.email && <ProfileButton />}
+					{session?.user.email && (
+						<ProfileButton username={username} />
+					)}
 				</div>
 			</div>
 		</div>

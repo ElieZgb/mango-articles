@@ -1,6 +1,7 @@
 "use client";
 import { formatDate } from "@lib/dateFormat";
 import { Share, PenTool } from "lucide-react";
+import PDFIcon from "@public/assets/icons/pdf-icon.svg";
 import Image from "@node_modules/next/image";
 import Link from "@node_modules/next/link";
 import React, { useEffect, useRef, useState } from "react";
@@ -89,7 +90,7 @@ export default function ArticleHeader({
 				</div>
 
 				<div className="flex items-center gap-3">
-					<div className="flex items-center gap-[2px]">
+					<div className="flex items-center gap-[2px] relative right-[-5px]">
 						<div className="relative top-[2px]">{likesCount}</div>
 						<div className="w-8 h-8 relative overflow-hidden rounded-full cursor-pointer">
 							<Lottie
@@ -112,9 +113,15 @@ export default function ArticleHeader({
 								}}
 							/>
 						</div>
-						{/* <HeartIcon size={20} className="cursor-pointer" /> */}
 					</div>
 					<Share size={20} className="cursor-pointer relative z-10" />
+					<Image
+						src={PDFIcon}
+						width={20}
+						height={20}
+						alt="PDF"
+						className="cursor-pointer"
+					/>
 					{sessionStatus === "authenticated" &&
 						session.user.email === author.email && (
 							<PenTool size={20} className="cursor-pointer" />

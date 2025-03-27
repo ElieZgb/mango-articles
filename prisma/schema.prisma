@@ -14,6 +14,7 @@ model User {
   password  String? // Nullable for social logins
   username  String?   @unique // When logging in from social, this will start as null
   name      String?
+  bio       String?
   image     String? // Profile picture
   accounts  Account[] // One user can have multiple auth methods
   sessions  Session[] // JWT-based sessions

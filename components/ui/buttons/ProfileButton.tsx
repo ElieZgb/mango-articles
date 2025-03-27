@@ -9,7 +9,11 @@ import Divider from "../tiles/Divider";
 import clsx from "@node_modules/clsx";
 import type { Session } from "next-auth";
 
-export default function ProfileButton() {
+export default function ProfileButton({
+	username,
+}: {
+	username: string | null;
+}) {
 	const { data: session } = useSession();
 	const [active, setActive] = useState<boolean>(false);
 
@@ -32,6 +36,7 @@ export default function ProfileButton() {
 					active={active}
 					setActive={setActive}
 					session={session}
+					username={username}
 				/>
 			)}
 		</div>
@@ -42,10 +47,12 @@ const BurgerMenu = ({
 	active,
 	setActive,
 	session,
+	username,
 }: {
 	active: boolean;
 	session: Session | null;
 	setActive: React.Dispatch<React.SetStateAction<boolean>>;
+	username: string | null;
 }) => {
 	const menuRef = useRef<HTMLDivElement | null>(null);
 	useEffect(() => {
@@ -80,7 +87,7 @@ const BurgerMenu = ({
 				closeMenu={closeMenu}
 				icon={User}
 				label="Profile"
-				url="/profile"
+				url={`/${username}`}
 			/>
 			<ProfileButtonTile
 				closeMenu={closeMenu}

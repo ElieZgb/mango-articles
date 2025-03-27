@@ -15,6 +15,13 @@ export default function PopupModal() {
 	useEffect(() => {
 		if (popupState?.isOpen) {
 			setHidden(false);
+			if (document) {
+				document.body.style.overflow = "hidden";
+			}
+		} else {
+			if (document) {
+				document.body.style.overflow = "unset";
+			}
 		}
 	}, [popupState]);
 
@@ -79,7 +86,7 @@ export default function PopupModal() {
 				<p className="text-center text-sm">
 					Pick a username for your new account.
 					<br />
-					You can always change it later.
+					Make it stand out! You can&apos;t change it later.
 				</p>
 				<form onSubmit={handleSubmit} className="w-full max-w-[300px]">
 					<div className="relative">

@@ -27,7 +27,14 @@ export default function AuthenticationModal() {
 
 	useEffect(() => {
 		if (modalState?.isOpen) {
+			if (document) {
+				document.body.style.overflow = "hidden";
+			}
 			setHidden(false);
+		} else {
+			if (document) {
+				document.body.style.overflow = "unset";
+			}
 		}
 	}, [modalState]);
 
