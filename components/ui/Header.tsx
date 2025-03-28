@@ -5,6 +5,7 @@ import { useModalsState } from "@state/modals";
 import ProfileButton from "./buttons/ProfileButton";
 import Link from "@node_modules/next/link";
 import { usePopupState } from "@state/popups";
+import { useRouter } from "@node_modules/next/navigation";
 
 export default function Header() {
 	const { data: session } = useSession();
@@ -12,6 +13,7 @@ export default function Header() {
 	const { setData: setPopupData } = usePopupState();
 	const [doneFetching, setDoneFetching] = useState<boolean>(false);
 	const [username, setUsername] = useState<string | null>(null);
+	const router = useRouter();
 
 	const openModal = (type: number) => {
 		setModalData({ isOpen: true, type });
@@ -45,6 +47,9 @@ export default function Header() {
 	}, [session]);
 
 	const handleWritePage = () => {
+		router.push("/write");
+		return;
+
 		if (!session?.user?.email) {
 			setModalData({
 				isOpen: true,
