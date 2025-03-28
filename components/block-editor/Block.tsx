@@ -8,11 +8,6 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactPlayer from "react-player";
 import { Loader2, Trash2 } from "lucide-react";
 
-export interface SelectionPosition {
-	x: number;
-	y: number;
-}
-
 export default function Block({
 	id,
 	type,
@@ -21,8 +16,11 @@ export default function Block({
 	updateTooltip,
 	updateBlock,
 	imagePreview,
+	setPopoverVisible,
+	setPopoverPosition,
 }: Block) {
-	const blockRef = useRef<HTMLTextAreaElement>(null);
+	const blockRef = useRef<HTMLElement>(null);
+	const labelRef = useRef<HTMLLabelElement>(null);
 	const [codeLanguage, setCodeLanguage] = useState<string>("javascript");
 	const [videoLinkTextareaVisible, setVideoLinkTextareaVisible] =
 		useState<boolean>(true);
@@ -47,31 +45,66 @@ export default function Block({
 		updateTooltip({ visible: false });
 	};
 
-	const handleMouseUp = () => {};
+	const handleSelection = () => {
+		const selection = window.getSelection();
+
+		if (!selection || !selection.rangeCount)
+			return setPopoverVisible(false);
+
+		if (selection.toString().length == 0) return setPopoverVisible(false);
+		const range = selection.getRangeAt(0);
+		const rect = range.getBoundingClientRect();
+
+		if (!rect.width) {
+			setPopoverVisible(false);
+			return;
+		}
+
+		setPopoverPosition({
+			x: rect.left + window.scrollX,
+			y: rect.top + window.scrollY - 70,
+		});
+
+		setPopoverVisible(true);
+	};
 
 	if (type == "text" || type == "title") {
 		return (
 			<div
-				onMouseUp={handleMouseUp}
 				className={clsx(
 					"flex my-2 w-full relative",
 					type == "title" ? "text-5xl" : "text-xl",
 					className
 				)}
 			>
-				<textarea
-					ref={blockRef}
-					placeholder={placeholder}
+				<label
+					ref={labelRef}
 					className={clsx(
-						"bg-transparent resize-none font-display-regular outline-none flex-1 p-1 relative top-1 placeholder:font-logo placeholder:text-[#aaa]",
+						"absolute left-1 top-[58%] translate-y-[-50%] text-[#aaa] font-logo"
+					)}
+				>
+					{placeholder}
+				</label>
+				<div
+					ref={blockRef as React.Ref<HTMLDivElement>}
+					contentEditable={true}
+					onMouseUp={handleSelection}
+					className={clsx(
+						"bg-transparent font-display-regular outline-none flex-1 p-1 relative top-1",
 						type == "title" ? "h-[55px]" : "h-[36px]"
 					)}
-					onFocus={(v) => {
-						if (v.target.value.length > 0) return;
+					onClick={(e) => {
+						if (
+							e.currentTarget.innerHTML.length > 0 &&
+							e.currentTarget.innerHTML.trim() != "<br>"
+						)
+							return;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = v.target.getBoundingClientRect().x;
-						const Y = v.target.getBoundingClientRect().y + scrollY;
-						const height = v.target.getBoundingClientRect().height;
+						const X = e.currentTarget.getBoundingClientRect().x;
+						const Y =
+							e.currentTarget.getBoundingClientRect().y + scrollY;
+						const height =
+							e.currentTarget.getBoundingClientRect().height;
 
 						updateTooltip({
 							visible: true,
@@ -80,7 +113,7 @@ export default function Block({
 						});
 					}}
 					onInput={(e) => {
-						e.currentTarget.style.height = "0px";
+						e.currentTarget.style.height = "auto";
 						e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
 						const scrollY = window.scrollY || window.pageYOffset;
 						const X = e.currentTarget.getBoundingClientRect().x;
@@ -89,13 +122,28 @@ export default function Block({
 						const height =
 							e.currentTarget.getBoundingClientRect().height;
 
-						if (e.currentTarget.value.length > 0) {
-							updateTooltip({
-								visible: false,
-								blockId: id,
-								position: { x: X, y: Y + height / 2 },
-							});
+						if (e.currentTarget.innerHTML.length > 0) {
+							if (e.currentTarget.innerHTML.trim() == "<br>") {
+								e.currentTarget.innerHTML = "";
+								if (labelRef.current)
+									labelRef.current.style.display = "unset";
+								updateTooltip({
+									visible: true,
+									blockId: id,
+									position: { x: X, y: Y + height / 2 },
+								});
+							} else {
+								if (labelRef.current)
+									labelRef.current.style.display = "none";
+								updateTooltip({
+									visible: false,
+									blockId: id,
+									position: { x: X, y: Y + height / 2 },
+								});
+							}
 						} else {
+							if (labelRef.current)
+								labelRef.current.style.display = "unset";
 							updateTooltip({
 								visible: true,
 								blockId: id,
@@ -110,10 +158,10 @@ export default function Block({
 							id,
 							updateTooltip,
 							updateBlock,
-							textValue: e.currentTarget.value,
+							textValue: e.currentTarget.innerHTML,
 						});
 					}}
-				></textarea>
+				></div>
 			</div>
 		);
 	}
@@ -171,7 +219,7 @@ export default function Block({
 				)}
 			>
 				<textarea
-					ref={blockRef}
+					ref={blockRef as React.Ref<HTMLTextAreaElement>}
 					placeholder={"const x = 10;"}
 					className={clsx(
 						"bg-[#ececec] border border-black rounded-sm resize-none font-mono outline-none w-full px-10 py-10 relative top-1"
@@ -248,19 +296,34 @@ export default function Block({
 					className
 				)}
 			>
-				<textarea
-					ref={blockRef}
-					placeholder={placeholder}
+				<label
+					ref={labelRef}
 					className={clsx(
-						"bg-transparent resize-none h-[36px] font-display-regular outline-none w-full p-1 relative top-1 placeholder:font-logo placeholder:text-[#aaa]",
+						"absolute left-1 top-[58%] translate-y-[-50%] text-[#aaa] font-logo"
+					)}
+				>
+					{placeholder}
+				</label>
+				<div
+					ref={blockRef as React.Ref<HTMLDivElement>}
+					onMouseUp={handleSelection}
+					contentEditable={true}
+					className={clsx(
+						"bg-transparent resize-none underline h-[36px] font-display-regular outline-none w-full p-1 relative top-1 placeholder:font-logo placeholder:text-[#aaa]",
 						!videoLinkTextareaVisible && "hidden"
 					)}
-					onFocus={(v) => {
-						if (v.target.value.length > 0) return;
+					onClick={(e) => {
+						if (
+							e.currentTarget.innerHTML.length > 0 &&
+							e.currentTarget.innerHTML != "<br>"
+						)
+							return;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = v.target.getBoundingClientRect().x;
-						const Y = v.target.getBoundingClientRect().y + scrollY;
-						const height = v.target.getBoundingClientRect().height;
+						const X = e.currentTarget.getBoundingClientRect().x;
+						const Y =
+							e.currentTarget.getBoundingClientRect().y + scrollY;
+						const height =
+							e.currentTarget.getBoundingClientRect().height;
 
 						updateTooltip({
 							visible: true,
@@ -269,7 +332,7 @@ export default function Block({
 						});
 					}}
 					onInput={(e) => {
-						e.currentTarget.style.height = "0px";
+						e.currentTarget.style.height = "auto";
 						e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
 						const scrollY = window.scrollY || window.pageYOffset;
 						const X = e.currentTarget.getBoundingClientRect().x;
@@ -278,37 +341,46 @@ export default function Block({
 						const height =
 							e.currentTarget.getBoundingClientRect().height;
 
-						if (e.currentTarget.value.length > 0) {
-							updateTooltip({
-								visible: false,
-								blockId: id,
-								position: { x: X, y: Y + height / 2 },
-							});
+						if (e.currentTarget.innerHTML.length > 0) {
+							if (e.currentTarget.innerHTML.trim() == "<br>") {
+								e.currentTarget.innerHTML = "";
+								if (labelRef.current)
+									labelRef.current.style.display = "unset";
+								updateTooltip({
+									visible: true,
+									blockId: id,
+									position: { x: X, y: Y + height / 2 },
+								});
+							} else {
+								if (labelRef.current)
+									labelRef.current.style.display = "none";
+								updateTooltip({
+									visible: false,
+									blockId: id,
+									position: { x: X, y: Y + height / 2 },
+								});
+							}
 						} else {
+							if (labelRef.current)
+								labelRef.current.style.display = "unset";
 							updateTooltip({
 								visible: true,
 								blockId: id,
 								position: { x: X, y: Y + height / 2 },
 							});
 						}
-
-						if (e.currentTarget.value.length > 0) {
-							e.currentTarget.style.textDecoration = "underline";
-						} else {
-							e.currentTarget.style.textDecoration = "none";
-						}
 					}}
 					onKeyUp={(e) => {
 						if (e.key === "Enter") {
 							if (
 								blockRef.current &&
-								blockRef.current?.value.length < 5
+								blockRef.current?.innerHTML.length < 5
 							)
 								return;
 							setVideoLinkTextareaVisible(false);
 						}
 					}}
-				></textarea>
+				></div>
 				{!videoLinkTextareaVisible && blockRef.current && (
 					<div className="w-full aspect-video rounded-sm overflow-hidden relative group">
 						<div className="absolute w-full h-full left-0 top-0 bg-mango/60 flex items-center justify-center">
@@ -319,7 +391,7 @@ export default function Block({
 						</div>
 						<div className="w-full h-full relative">
 							<ReactPlayer
-								url={blockRef.current.value}
+								url={blockRef.current.innerHTML}
 								width="100%"
 								height="100%"
 								controls

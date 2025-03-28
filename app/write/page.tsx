@@ -3,6 +3,7 @@ import Block from "@components/block-editor/Block";
 import React, { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import BlockTooltipControl from "@components/block-editor/BlockTooltipControl";
+import SelectionFloatingToolbar from "@components/block-editor/SelectionFloatingToolbar";
 
 export interface Block {
 	id: string;
@@ -18,6 +19,13 @@ export interface Block {
 	) => void;
 	imageFile?: File | null;
 	imagePreview?: string | null;
+	setPopoverVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setPopoverPosition: React.Dispatch<
+		React.SetStateAction<{
+			x: number;
+			y: number;
+		}>
+	>;
 }
 
 export interface Tooltip {
@@ -35,6 +43,8 @@ export default function Page() {
 		position: { x: null, y: null },
 		blockId: null,
 	});
+	const [popoverVisible, setPopoverVisible] = useState(false);
+	const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
 
 	const updateTooltip = (updates: Partial<Tooltip>) => {
 		setTooltip((prev) => ({ ...prev, ...updates }));
@@ -65,6 +75,8 @@ export default function Page() {
 			placeholder: "Title",
 			updateTooltip,
 			updateBlock,
+			setPopoverPosition,
+			setPopoverVisible,
 		},
 	]);
 
@@ -85,9 +97,30 @@ export default function Page() {
 				updateTooltip,
 				placeholder: "Type something...",
 				updateBlock,
+				setPopoverPosition,
+				setPopoverVisible,
 			},
 		]);
 	};
+
+	useEffect(() => {
+		const handleSelectionChange = () => {
+			const selection = window.getSelection();
+
+			if (!selection || selection.isCollapsed) {
+				setPopoverVisible(false);
+			}
+		};
+
+		document.addEventListener("selectionchange", handleSelectionChange);
+
+		return () => {
+			document.removeEventListener(
+				"selectionchange",
+				handleSelectionChange
+			);
+		};
+	}, []);
 
 	return (
 		<div className="flex justify-center">
@@ -97,8 +130,23 @@ export default function Page() {
 					updateBlock={updateBlock}
 					updateTooltip={updateTooltip}
 				/>
+				{popoverVisible && (
+					<SelectionFloatingToolbar
+						position={{
+							x: popoverPosition.x,
+							y: popoverPosition.y,
+						}}
+					/>
+				)}
 				{blocks.map((block) => {
-					return <Block key={block.id} {...block} />;
+					return (
+						<Block
+							key={block.id}
+							{...block}
+							setPopoverVisible={setPopoverVisible}
+							setPopoverPosition={setPopoverPosition}
+						/>
+					);
 				})}
 				<button
 					onClick={addNewBlock}
