@@ -15,7 +15,7 @@ import type { StaticImport } from "@node_modules/next/dist/shared/lib/get-img-pr
 import { signIn } from "@node_modules/next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-	ModalState,
+	type SignInRegisterModalState,
 	useSignInRegisterModalState,
 } from "@state/signInRegisterModals";
 import { useRouter } from "@node_modules/next/navigation";
@@ -93,7 +93,7 @@ export default function AuthenticationModal() {
 }
 
 interface FormProps {
-	setModalData: (data: Partial<ModalState>) => void;
+	setModalData: (data: Partial<SignInRegisterModalState>) => void;
 	title: string | null | undefined;
 }
 
