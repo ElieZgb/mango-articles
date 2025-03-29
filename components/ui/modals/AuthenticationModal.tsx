@@ -14,7 +14,10 @@ import Image from "@node_modules/next/image";
 import type { StaticImport } from "@node_modules/next/dist/shared/lib/get-img-props";
 import { signIn } from "@node_modules/next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ModalState, useModalsState } from "@state/modals";
+import {
+	ModalState,
+	useSignInRegisterModalState,
+} from "@state/signInRegisterModals";
 import { useRouter } from "@node_modules/next/navigation";
 import { signInSchema, type SignInSchema } from "@schema/signInSchema";
 import { type SignUpSchema, signUpSchema } from "@schema/signUpSchema";
@@ -23,7 +26,8 @@ import { Loader2, CircleCheck, XCircle } from "lucide-react";
 
 export default function AuthenticationModal() {
 	const [hidden, setHidden] = useState(true);
-	const { data: modalState, setData: setModalData } = useModalsState();
+	const { data: modalState, setData: setModalData } =
+		useSignInRegisterModalState();
 
 	useEffect(() => {
 		if (modalState?.isOpen) {

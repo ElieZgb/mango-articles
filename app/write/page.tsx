@@ -6,6 +6,8 @@ import BlockTooltipControl from "@components/block-editor/BlockTooltipControl";
 import SelectionFloatingToolbar from "@components/block-editor/SelectionFloatingToolbar";
 import MentionPopup from "@components/block-editor/MentionPopup";
 import { useMentionPopupState } from "@state/mentionBlockPopup";
+import { useBlockTooltipState } from "@state/blockTooltipControl";
+import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
 
 export interface Block {
 	id: string;
@@ -13,7 +15,6 @@ export interface Block {
 	textValue?: string;
 	className?: string;
 	placeholder?: string;
-	updateTooltip: (updates: Partial<Tooltip>) => void;
 	updateBlock: (
 		id: string,
 		newBlock: Partial<Block>,
@@ -21,37 +22,14 @@ export interface Block {
 	) => void;
 	imageFile?: File | null;
 	imagePreview?: string | null;
-	setPopoverVisible: React.Dispatch<React.SetStateAction<boolean>>;
-	setPopoverPosition: React.Dispatch<
-		React.SetStateAction<{
-			x: number;
-			y: number;
-		}>
-	>;
-}
-
-export interface Tooltip {
-	visible: boolean;
-	position: {
-		x: number | null;
-		y: number | null;
-	};
-	blockId: string | null;
 }
 
 export default function Page() {
-	const [tooltip, setTooltip] = useState<Tooltip>({
-		visible: true,
-		position: { x: null, y: null },
-		blockId: null,
-	});
-	const [popoverVisible, setPopoverVisible] = useState(false);
-	const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
+	const { data: tooltipState, setData: setBlockTooltip } =
+		useBlockTooltipState();
+	const { data: floatingToolbarState, setData: setFloatingToolbar } =
+		useSelectionFloatingToolbarState();
 	const { data: mentionPopup } = useMentionPopupState();
-
-	const updateTooltip = (updates: Partial<Tooltip>) => {
-		setTooltip((prev) => ({ ...prev, ...updates }));
-	};
 
 	const updateBlock = (
 		id: string,
@@ -76,15 +54,12 @@ export default function Page() {
 			id: Date.now().toString(),
 			type: "title",
 			placeholder: "Title",
-			updateTooltip,
 			updateBlock,
-			setPopoverPosition,
-			setPopoverVisible,
 		},
 	]);
 
 	useEffect(() => {
-		updateTooltip({ blockId: blocks[0].id });
+		setBlockTooltip({ blockId: blocks[0].id });
 	}, []);
 
 	useEffect(() => {
@@ -97,11 +72,8 @@ export default function Page() {
 			{
 				id: Date.now().toString(),
 				type: "text",
-				updateTooltip,
 				placeholder: "Type something...",
 				updateBlock,
-				setPopoverPosition,
-				setPopoverVisible,
 			},
 		]);
 	};
@@ -111,7 +83,7 @@ export default function Page() {
 			const selection = window.getSelection();
 
 			if (!selection || selection.isCollapsed) {
-				setPopoverVisible(false);
+				setFloatingToolbar({ active: false });
 			}
 		};
 
@@ -129,32 +101,23 @@ export default function Page() {
 		<div className="flex justify-center">
 			<div className="mx-16 max-w-[900px] min-h-screen w-full py-10">
 				<BlockTooltipControl
-					tooltip={tooltip}
+					blockId={tooltipState?.blockId || null}
+					position={tooltipState?.position || { x: null, y: null }}
+					visible={tooltipState?.visible || false}
 					updateBlock={updateBlock}
-					updateTooltip={updateTooltip}
 				/>
 				{mentionPopup?.active && (
 					<MentionPopup
 						position={mentionPopup?.position || { x: 0, y: 0 }}
 					/>
 				)}
-				{popoverVisible && (
+				{floatingToolbarState?.active && (
 					<SelectionFloatingToolbar
-						position={{
-							x: popoverPosition.x,
-							y: popoverPosition.y,
-						}}
+						position={floatingToolbarState.position}
 					/>
 				)}
 				{blocks.map((block) => {
-					return (
-						<Block
-							key={block.id}
-							{...block}
-							setPopoverVisible={setPopoverVisible}
-							setPopoverPosition={setPopoverPosition}
-						/>
-					);
+					return <Block key={block.id} {...block} />;
 				})}
 				<button
 					onClick={addNewBlock}

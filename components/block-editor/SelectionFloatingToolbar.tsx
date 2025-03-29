@@ -1,7 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link2 } from "lucide-react";
-import { isValidURL } from "@lib/validateURL";
 
 export default function SelectionFloatingToolbar({
 	position,

@@ -8,17 +8,16 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactPlayer from "react-player";
 import { Loader2, Trash2 } from "lucide-react";
 import { useMentionPopupState } from "@state/mentionBlockPopup";
+import { useBlockTooltipState } from "@state/blockTooltipControl";
+import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
 
 export default function Block({
 	id,
 	type,
 	className,
 	placeholder,
-	updateTooltip,
 	updateBlock,
 	imagePreview,
-	setPopoverVisible,
-	setPopoverPosition,
 }: Block) {
 	const blockRef = useRef<HTMLElement>(null);
 	const labelRef = useRef<HTMLLabelElement>(null);
@@ -26,6 +25,9 @@ export default function Block({
 	const [videoLinkTextareaVisible, setVideoLinkTextareaVisible] =
 		useState<boolean>(true);
 	const { setData: setMentionPopup } = useMentionPopupState();
+	const { setData: setBlockTooltip } = useBlockTooltipState();
+	const { setData: setSelectionFloatingToolbar } =
+		useSelectionFloatingToolbarState();
 
 	useEffect(() => {
 		if (blockRef.current) {
@@ -34,40 +36,43 @@ export default function Block({
 			const Y = blockRef.current.getBoundingClientRect().y + scrollY;
 			const height = blockRef.current.getBoundingClientRect().height;
 
-			updateTooltip({
+			setBlockTooltip({
 				visible: true,
 				position: { x: X, y: Y + height / 2 },
 				blockId: id,
 			});
 		}
-	}, [blockRef, updateTooltip]);
+	}, [blockRef]);
 
 	const handleDeleteBlock = () => {
 		updateBlock(id, {}, "delete");
-		updateTooltip({ visible: false });
+		setBlockTooltip({ visible: false });
 	};
 
 	const handleSelection = () => {
 		const selection = window.getSelection();
 
 		if (!selection || !selection.rangeCount)
-			return setPopoverVisible(false);
+			return setSelectionFloatingToolbar({ active: false });
 
-		if (selection.toString().length == 0) return setPopoverVisible(false);
+		if (selection.toString().length == 0)
+			return setSelectionFloatingToolbar({ active: false });
 		const range = selection.getRangeAt(0);
 		const rect = range.getBoundingClientRect();
 
 		if (!rect.width) {
-			setPopoverVisible(false);
+			setSelectionFloatingToolbar({ active: false });
 			return;
 		}
 
-		setPopoverPosition({
-			x: rect.left + window.scrollX,
-			y: rect.top + window.scrollY - 70,
+		setSelectionFloatingToolbar({
+			position: {
+				x: rect.left + window.scrollX,
+				y: rect.top + window.scrollY - 70,
+			},
 		});
 
-		setPopoverVisible(true);
+		setSelectionFloatingToolbar({ active: true });
 	};
 
 	if (type == "text" || type == "title") {
@@ -107,7 +112,7 @@ export default function Block({
 						const Y = target.getBoundingClientRect().y + scrollY;
 						const height = target.getBoundingClientRect().height;
 
-						updateTooltip({
+						setBlockTooltip({
 							visible: true,
 							position: { x: X, y: Y + height / 2 },
 							blockId: id,
@@ -127,7 +132,7 @@ export default function Block({
 								target.innerHTML = "";
 								if (labelRef.current)
 									labelRef.current.style.display = "unset";
-								updateTooltip({
+								setBlockTooltip({
 									visible: true,
 									blockId: id,
 									position: { x: X, y: Y + height / 2 },
@@ -135,7 +140,7 @@ export default function Block({
 							} else {
 								if (labelRef.current)
 									labelRef.current.style.display = "none";
-								updateTooltip({
+								setBlockTooltip({
 									visible: false,
 									blockId: id,
 									position: { x: X, y: Y + height / 2 },
@@ -144,7 +149,7 @@ export default function Block({
 						} else {
 							if (labelRef.current)
 								labelRef.current.style.display = "unset";
-							updateTooltip({
+							setBlockTooltip({
 								visible: true,
 								blockId: id,
 								position: { x: X, y: Y + height / 2 },
@@ -158,7 +163,6 @@ export default function Block({
 							className,
 							type,
 							id,
-							updateTooltip,
 							updateBlock,
 							textValue: target.innerHTML,
 						});
@@ -252,7 +256,7 @@ export default function Block({
 						const Y = target.getBoundingClientRect().y + scrollY;
 						const height = target.getBoundingClientRect().height;
 
-						updateTooltip({
+						setBlockTooltip({
 							visible: true,
 							position: { x: X, y: Y + height / 2 },
 							blockId: id,
@@ -268,13 +272,13 @@ export default function Block({
 						const height = target.getBoundingClientRect().height;
 
 						if (target.value.length > 0) {
-							updateTooltip({
+							setBlockTooltip({
 								visible: false,
 								blockId: id,
 								position: { x: X, y: Y + height / 2 },
 							});
 						} else {
-							updateTooltip({
+							setBlockTooltip({
 								visible: true,
 								blockId: id,
 								position: { x: X, y: Y + height / 2 },
@@ -286,7 +290,6 @@ export default function Block({
 							className,
 							type,
 							id,
-							updateTooltip,
 							updateBlock,
 							textValue: target.value,
 						});
@@ -345,7 +348,7 @@ export default function Block({
 						const Y = target.getBoundingClientRect().y + scrollY;
 						const height = target.getBoundingClientRect().height;
 
-						updateTooltip({
+						setBlockTooltip({
 							visible: true,
 							position: { x: X, y: Y + height / 2 },
 							blockId: id,
@@ -365,7 +368,7 @@ export default function Block({
 								target.innerHTML = "";
 								if (labelRef.current)
 									labelRef.current.style.display = "unset";
-								updateTooltip({
+								setBlockTooltip({
 									visible: true,
 									blockId: id,
 									position: { x: X, y: Y + height / 2 },
@@ -373,7 +376,7 @@ export default function Block({
 							} else {
 								if (labelRef.current)
 									labelRef.current.style.display = "none";
-								updateTooltip({
+								setBlockTooltip({
 									visible: false,
 									blockId: id,
 									position: { x: X, y: Y + height / 2 },
@@ -382,7 +385,7 @@ export default function Block({
 						} else {
 							if (labelRef.current)
 								labelRef.current.style.display = "unset";
-							updateTooltip({
+							setBlockTooltip({
 								visible: true,
 								blockId: id,
 								position: { x: X, y: Y + height / 2 },

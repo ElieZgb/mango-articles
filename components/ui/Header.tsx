@@ -1,16 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { signOut, useSession } from "@node_modules/next-auth/react";
-import { useModalsState } from "@state/modals";
+import { useSignInRegisterModalState } from "@state/signInRegisterModals";
 import ProfileButton from "./buttons/ProfileButton";
 import Link from "@node_modules/next/link";
-import { usePopupState } from "@state/popups";
+import { useUsernamePopupState } from "@state/usernamePopup";
 import { useRouter } from "@node_modules/next/navigation";
 
 export default function Header() {
 	const { data: session } = useSession();
-	const { setData: setModalData } = useModalsState();
-	const { setData: setPopupData } = usePopupState();
+	const { setData: setModalData } = useSignInRegisterModalState();
+	const { setData: setPopupData } = useUsernamePopupState();
 	const [doneFetching, setDoneFetching] = useState<boolean>(false);
 	const [username, setUsername] = useState<string | null>(null);
 	const router = useRouter();

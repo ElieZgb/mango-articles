@@ -1,5 +1,5 @@
 "use client";
-import { usePopupState } from "@state/popups";
+import { useUsernamePopupState } from "@state/usernamePopup";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
@@ -10,7 +10,8 @@ export default function PopupModal() {
 	const [username, setUsername] = useState<string>("");
 	const [success, setSuccess] = useState<boolean | null>(null);
 	const [hidden, setHidden] = useState(true);
-	const { data: popupState, setData: setPopupState } = usePopupState();
+	const { data: popupState, setData: setPopupState } =
+		useUsernamePopupState();
 
 	useEffect(() => {
 		if (popupState?.isOpen) {

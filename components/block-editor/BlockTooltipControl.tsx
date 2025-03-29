@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef, useEffect } from "react";
 import {
 	PlusCircle,
@@ -9,24 +10,31 @@ import {
 	type LucideProps,
 } from "lucide-react";
 import clsx from "clsx";
-import type { Block, Tooltip } from "@app/write/page";
+import type { Block } from "@app/write/page";
+import { useBlockTooltipState } from "@state/blockTooltipControl";
 
 const ICON_SIZE = 27;
 
 export default function BlockTooltipControl({
-	tooltip,
+	visible,
+	position,
+	blockId,
 	updateBlock,
-	updateTooltip,
 }: {
-	tooltip: Tooltip;
 	updateBlock: (
 		id: string,
 		newBlock: Partial<Block>,
 		action?: "update" | "delete"
 	) => void;
-	updateTooltip: (updates: Partial<Tooltip>) => void;
+	visible: boolean;
+	position: {
+		x: number | null;
+		y: number | null;
+	};
+	blockId: string | null;
 }) {
-	const { visible, position, blockId } = tooltip;
+	const { setData } = useBlockTooltipState();
+	// const { visible, position, blockId } = tooltip;
 	const [options, setOptions] = useState<boolean>(false);
 	const imageInputRef = useRef<HTMLInputElement | null>(null);
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -41,14 +49,14 @@ export default function BlockTooltipControl({
 	const addSeparator = () => {
 		if (blockId) {
 			updateBlock(blockId, { type: "separator" });
-			updateTooltip({ visible: false });
+			setData({ visible: false });
 		}
 	};
 
 	const addCodeBlock = () => {
 		if (blockId) {
 			updateBlock(blockId, { type: "codeblock" });
-			updateTooltip({ visible: false });
+			setData({ visible: false });
 		}
 	};
 
@@ -59,7 +67,7 @@ export default function BlockTooltipControl({
 				placeholder:
 					"Paste a Youtube, Vimeo, or other video link, and press Enter",
 			});
-			updateTooltip({ visible: false });
+			setData({ visible: false });
 		}
 	};
 
@@ -68,7 +76,7 @@ export default function BlockTooltipControl({
 	}, [visible, position]);
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		updateTooltip({ visible: false });
+		setData({ visible: false });
 		const selectedFile = e.target.files![0];
 
 		if (!selectedFile) return;
@@ -91,7 +99,7 @@ export default function BlockTooltipControl({
 	const handleDeleteBlock = () => {
 		if (!blockId) return;
 		updateBlock(blockId, {}, "delete");
-		updateTooltip({ visible: false });
+		setData({ visible: false });
 	};
 
 	if (!visible || !position.x || !position.y) {
