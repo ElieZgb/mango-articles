@@ -8,7 +8,7 @@ import { useUsernamePopupState } from "@state/usernamePopup";
 import { useRouter } from "@node_modules/next/navigation";
 
 export default function Header() {
-	const { data: session } = useSession();
+	const { data: session, status: sessionStatus } = useSession();
 	const { setData: setModalData } = useSignInRegisterModalState();
 	const { setData: setPopupData } = useUsernamePopupState();
 	const [doneFetching, setDoneFetching] = useState<boolean>(false);
@@ -47,16 +47,15 @@ export default function Header() {
 	}, [session]);
 
 	const handleWritePage = () => {
-		router.push("/write");
-		return;
-
-		if (!session?.user?.email) {
-			setModalData({
-				isOpen: true,
-				type: 1,
-				title: "Create an account to start writing.",
-			});
+		if (sessionStatus === "authenticated") {
+			return router.push("/write");
 		}
+
+		setModalData({
+			isOpen: true,
+			type: 1,
+			title: "Create an account to start writing.",
+		});
 	};
 
 	return (
