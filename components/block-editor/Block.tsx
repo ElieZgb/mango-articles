@@ -7,6 +7,7 @@ import LanguageSelector from "./LanguageSelector";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ReactPlayer from "react-player";
 import { Loader2, Trash2 } from "lucide-react";
+import { useMentionPopupState } from "@state/mentionBlockPopup";
 
 export default function Block({
 	id,
@@ -24,6 +25,7 @@ export default function Block({
 	const [codeLanguage, setCodeLanguage] = useState<string>("javascript");
 	const [videoLinkTextareaVisible, setVideoLinkTextareaVisible] =
 		useState<boolean>(true);
+	const { setData: setMentionPopup } = useMentionPopupState();
 
 	useEffect(() => {
 		if (blockRef.current) {
@@ -94,17 +96,16 @@ export default function Block({
 						type == "title" ? "h-[55px]" : "h-[36px]"
 					)}
 					onClick={(e) => {
+						const target = e.currentTarget;
 						if (
-							e.currentTarget.innerHTML.length > 0 &&
-							e.currentTarget.innerHTML.trim() != "<br>"
+							target.innerHTML.length > 0 &&
+							target.innerHTML.trim() != "<br>"
 						)
 							return;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = e.currentTarget.getBoundingClientRect().x;
-						const Y =
-							e.currentTarget.getBoundingClientRect().y + scrollY;
-						const height =
-							e.currentTarget.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
 						updateTooltip({
 							visible: true,
@@ -113,18 +114,17 @@ export default function Block({
 						});
 					}}
 					onInput={(e) => {
-						e.currentTarget.style.height = "auto";
-						e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+						const target = e.currentTarget;
+						target.style.height = "auto";
+						target.style.height = `${target.scrollHeight}px`;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = e.currentTarget.getBoundingClientRect().x;
-						const Y =
-							e.currentTarget.getBoundingClientRect().y + scrollY;
-						const height =
-							e.currentTarget.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
-						if (e.currentTarget.innerHTML.length > 0) {
-							if (e.currentTarget.innerHTML.trim() == "<br>") {
-								e.currentTarget.innerHTML = "";
+						if (target.innerHTML.length > 0) {
+							if (target.innerHTML.trim() == "<br>") {
+								target.innerHTML = "";
 								if (labelRef.current)
 									labelRef.current.style.display = "unset";
 								updateTooltip({
@@ -151,6 +151,8 @@ export default function Block({
 							});
 						}
 
+						setMentionPopup({ active: false });
+
 						updateBlock(id, {
 							placeholder,
 							className,
@@ -158,8 +160,26 @@ export default function Block({
 							id,
 							updateTooltip,
 							updateBlock,
-							textValue: e.currentTarget.innerHTML,
+							textValue: target.innerHTML,
 						});
+					}}
+					onKeyUp={(e: React.KeyboardEvent<HTMLDivElement>) => {
+						if (e.key === "@") {
+							const selection = window.getSelection();
+							if (!selection || selection.rangeCount === 0)
+								return;
+
+							const range = selection.getRangeAt(0);
+							const rect = range.getBoundingClientRect();
+
+							setMentionPopup({
+								active: true,
+								position: {
+									x: rect.left,
+									y: rect.top + rect.height + 20,
+								},
+							});
+						}
 					}}
 				></div>
 			</div>
@@ -225,11 +245,12 @@ export default function Block({
 						"bg-[#ececec] border border-black rounded-sm resize-none font-mono outline-none w-full px-10 py-10 relative top-1"
 					)}
 					onFocus={(v) => {
-						if (v.target.value.length > 0) return;
+						const target = v.currentTarget;
+						if (target.value.length > 0) return;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = v.target.getBoundingClientRect().x;
-						const Y = v.target.getBoundingClientRect().y + scrollY;
-						const height = v.target.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
 						updateTooltip({
 							visible: true,
@@ -238,16 +259,15 @@ export default function Block({
 						});
 					}}
 					onInput={(e) => {
-						e.currentTarget.style.height = "auto";
-						e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+						const target = e.currentTarget;
+						target.style.height = "auto";
+						target.style.height = `${target.scrollHeight}px`;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = e.currentTarget.getBoundingClientRect().x;
-						const Y =
-							e.currentTarget.getBoundingClientRect().y + scrollY;
-						const height =
-							e.currentTarget.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
-						if (e.currentTarget.value.length > 0) {
+						if (target.value.length > 0) {
 							updateTooltip({
 								visible: false,
 								blockId: id,
@@ -268,14 +288,15 @@ export default function Block({
 							id,
 							updateTooltip,
 							updateBlock,
-							textValue: e.currentTarget.value,
+							textValue: target.value,
 						});
 					}}
 				></textarea>
 				<span className="mt-3 text-sm">Code Preview:</span>
 				<div className="border rounded-sm border-black text-base">
 					<SyntaxHighlighter language={codeLanguage}>
-						{blockRef.current?.value || "const x = 10;"}
+						{(blockRef.current as HTMLTextAreaElement | null)
+							?.value || "const x = 10;"}
 					</SyntaxHighlighter>
 				</div>
 				<div className="absolute left-5 top-4 text-base">
@@ -313,17 +334,16 @@ export default function Block({
 						!videoLinkTextareaVisible && "hidden"
 					)}
 					onClick={(e) => {
+						const target = e.currentTarget;
 						if (
-							e.currentTarget.innerHTML.length > 0 &&
-							e.currentTarget.innerHTML != "<br>"
+							target.innerHTML.length > 0 &&
+							target.innerHTML != "<br>"
 						)
 							return;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = e.currentTarget.getBoundingClientRect().x;
-						const Y =
-							e.currentTarget.getBoundingClientRect().y + scrollY;
-						const height =
-							e.currentTarget.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
 						updateTooltip({
 							visible: true,
@@ -332,18 +352,17 @@ export default function Block({
 						});
 					}}
 					onInput={(e) => {
-						e.currentTarget.style.height = "auto";
-						e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+						const target = e.currentTarget;
+						target.style.height = "auto";
+						target.style.height = `${target.scrollHeight}px`;
 						const scrollY = window.scrollY || window.pageYOffset;
-						const X = e.currentTarget.getBoundingClientRect().x;
-						const Y =
-							e.currentTarget.getBoundingClientRect().y + scrollY;
-						const height =
-							e.currentTarget.getBoundingClientRect().height;
+						const X = target.getBoundingClientRect().x;
+						const Y = target.getBoundingClientRect().y + scrollY;
+						const height = target.getBoundingClientRect().height;
 
-						if (e.currentTarget.innerHTML.length > 0) {
-							if (e.currentTarget.innerHTML.trim() == "<br>") {
-								e.currentTarget.innerHTML = "";
+						if (target.innerHTML.length > 0) {
+							if (target.innerHTML.trim() == "<br>") {
+								target.innerHTML = "";
 								if (labelRef.current)
 									labelRef.current.style.display = "unset";
 								updateTooltip({

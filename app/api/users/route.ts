@@ -1,6 +1,21 @@
 import { db } from "@lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET() {
+	try {
+		const users = await db.user.findMany({
+			select: { name: true, id: true, username: true, image: true },
+		});
+		return NextResponse.json(users, { status: 200 });
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	} catch (error) {
+		return NextResponse.json(
+			{ error: "Internal Server Error" },
+			{ status: 500 }
+		);
+	}
+}
+
 export async function POST(req: NextRequest) {
 	try {
 		const { email } = await req.json();

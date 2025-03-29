@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import BlockTooltipControl from "@components/block-editor/BlockTooltipControl";
 import SelectionFloatingToolbar from "@components/block-editor/SelectionFloatingToolbar";
+import MentionPopup from "@components/block-editor/MentionPopup";
+import { useMentionPopupState } from "@state/mentionBlockPopup";
 
 export interface Block {
 	id: string;
@@ -45,6 +47,7 @@ export default function Page() {
 	});
 	const [popoverVisible, setPopoverVisible] = useState(false);
 	const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
+	const { data: mentionPopup } = useMentionPopupState();
 
 	const updateTooltip = (updates: Partial<Tooltip>) => {
 		setTooltip((prev) => ({ ...prev, ...updates }));
@@ -130,6 +133,11 @@ export default function Page() {
 					updateBlock={updateBlock}
 					updateTooltip={updateTooltip}
 				/>
+				{mentionPopup?.active && (
+					<MentionPopup
+						position={mentionPopup?.position || { x: 0, y: 0 }}
+					/>
+				)}
 				{popoverVisible && (
 					<SelectionFloatingToolbar
 						position={{
