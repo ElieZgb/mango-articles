@@ -1,11 +1,22 @@
 "use client";
 import React, { useState } from "react";
 import { Link2 } from "lucide-react";
+import type { BlockData } from "@app/write/page";
 
 export default function SelectionFloatingToolbar({
 	position,
+	updateBlock,
+	blockId,
+	blockRef,
 }: {
 	position: { x: number; y: number } | null;
+	updateBlock: (
+		id: string,
+		newBlock: Partial<BlockData>,
+		action?: "update" | "delete"
+	) => void;
+	blockId: string | null;
+	blockRef: React.RefObject<HTMLElement | null> | null;
 }) {
 	const [isBold, setIsBold] = useState<boolean>(true);
 	const [isItalic, setIsItalic] = useState<boolean>(true);
@@ -24,8 +35,17 @@ export default function SelectionFloatingToolbar({
 			span.textContent = selectedText;
 			range.deleteContents();
 			range.insertNode(span);
+
+			if (blockId && blockRef?.current) {
+				updateBlock(
+					blockId,
+					{ textValue: blockRef.current.innerHTML },
+					"update"
+				);
+			}
 		}
 	};
+
 	const toggleItalicFormat = () => {
 		setIsItalic((prev) => !prev);
 		const selection = window.getSelection();
@@ -39,6 +59,14 @@ export default function SelectionFloatingToolbar({
 			span.textContent = selectedText;
 			range.deleteContents();
 			range.insertNode(span);
+
+			if (blockId && blockRef?.current) {
+				updateBlock(
+					blockId,
+					{ textValue: blockRef.current.innerHTML },
+					"update"
+				);
+			}
 		}
 	};
 
@@ -60,6 +88,14 @@ export default function SelectionFloatingToolbar({
 			span.textContent = selectedText;
 			range.deleteContents();
 			range.insertNode(span);
+
+			if (blockId && blockRef?.current) {
+				updateBlock(
+					blockId,
+					{ textValue: blockRef.current.innerHTML },
+					"update"
+				);
+			}
 		}
 	};
 
@@ -101,6 +137,14 @@ export default function SelectionFloatingToolbar({
 				const span = document.createElement("span");
 				span.textContent = selectedText;
 				range.insertNode(span);
+			}
+
+			if (blockId && blockRef?.current) {
+				updateBlock(
+					blockId,
+					{ textValue: blockRef.current.innerHTML },
+					"update"
+				);
 			}
 		}
 	};

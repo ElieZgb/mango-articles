@@ -10,7 +10,7 @@ import {
 	type LucideProps,
 } from "lucide-react";
 import clsx from "clsx";
-import type { Block } from "@app/write/page";
+import type { BlockData } from "@app/write/page";
 import { useBlockTooltipState } from "@state/blockTooltipControl";
 
 const ICON_SIZE = 27;
@@ -23,7 +23,7 @@ export default function BlockTooltipControl({
 }: {
 	updateBlock: (
 		id: string,
-		newBlock: Partial<Block>,
+		newBlock: Partial<BlockData>,
 		action?: "update" | "delete"
 	) => void;
 	visible: boolean;
@@ -37,8 +37,6 @@ export default function BlockTooltipControl({
 	// const { visible, position, blockId } = tooltip;
 	const [options, setOptions] = useState<boolean>(false);
 	const imageInputRef = useRef<HTMLInputElement | null>(null);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
-	const [imageFile, setImageFile] = useState<File | null>(null);
 
 	const addImage = () => {
 		if (imageInputRef.current) {
@@ -48,14 +46,17 @@ export default function BlockTooltipControl({
 
 	const addSeparator = () => {
 		if (blockId) {
-			updateBlock(blockId, { type: "separator" });
+			updateBlock(blockId, { type: "separator", placeholder: undefined });
 			setData({ visible: false });
 		}
 	};
 
 	const addCodeBlock = () => {
 		if (blockId) {
-			updateBlock(blockId, { type: "codeblock" });
+			updateBlock(blockId, {
+				type: "codeblock",
+				placeholder: "const x = 10;",
+			});
 			setData({ visible: false });
 		}
 	};
@@ -81,15 +82,14 @@ export default function BlockTooltipControl({
 
 		if (!selectedFile) return;
 
-		setImageFile(selectedFile);
 		const reader = new FileReader();
 		reader.onloadend = () => {
-			setImagePreview(reader.result as string);
 			if (blockId) {
 				updateBlock(blockId, {
 					imageFile: selectedFile,
 					imagePreview: reader.result as string,
 					type: "image",
+					placeholder: undefined,
 				});
 			}
 		};

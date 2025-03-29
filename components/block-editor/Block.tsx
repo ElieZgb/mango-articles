@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import type { Block } from "@app/write/page";
+import type { BlockData } from "@app/write/page";
 import Image from "@node_modules/next/image";
 import LanguageSelector from "./LanguageSelector";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -11,6 +11,14 @@ import { useMentionPopupState } from "@state/mentionBlockPopup";
 import { useBlockTooltipState } from "@state/blockTooltipControl";
 import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
 
+export interface BlockProps extends BlockData {
+	updateBlock: (
+		id: string,
+		newBlock: Partial<BlockData>,
+		action?: "update" | "delete"
+	) => void;
+}
+
 export default function Block({
 	id,
 	type,
@@ -18,7 +26,7 @@ export default function Block({
 	placeholder,
 	updateBlock,
 	imagePreview,
-}: Block) {
+}: BlockProps) {
 	const blockRef = useRef<HTMLElement>(null);
 	const labelRef = useRef<HTMLLabelElement>(null);
 	const [codeLanguage, setCodeLanguage] = useState<string>("javascript");
@@ -66,13 +74,14 @@ export default function Block({
 		}
 
 		setSelectionFloatingToolbar({
+			active: true,
 			position: {
 				x: rect.left + window.scrollX,
 				y: rect.top + window.scrollY - 70,
 			},
+			blockRef: blockRef,
+			blockId: id,
 		});
-
-		setSelectionFloatingToolbar({ active: true });
 	};
 
 	if (type == "text" || type == "title") {
@@ -163,7 +172,6 @@ export default function Block({
 							className,
 							type,
 							id,
-							updateBlock,
 							textValue: target.innerHTML,
 						});
 					}}
@@ -244,7 +252,7 @@ export default function Block({
 			>
 				<textarea
 					ref={blockRef as React.Ref<HTMLTextAreaElement>}
-					placeholder={"const x = 10;"}
+					placeholder={placeholder}
 					className={clsx(
 						"bg-[#ececec] border border-black rounded-sm resize-none font-mono outline-none w-full px-10 py-10 relative top-1"
 					)}
@@ -290,7 +298,6 @@ export default function Block({
 							className,
 							type,
 							id,
-							updateBlock,
 							textValue: target.value,
 						});
 					}}

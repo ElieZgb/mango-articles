@@ -9,17 +9,12 @@ import { useMentionPopupState } from "@state/mentionBlockPopup";
 import { useBlockTooltipState } from "@state/blockTooltipControl";
 import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
 
-export interface Block {
+export interface BlockData {
 	id: string;
 	type: "text" | "title" | "image" | "separator" | "codeblock" | "videolink";
 	textValue?: string;
 	className?: string;
 	placeholder?: string;
-	updateBlock: (
-		id: string,
-		newBlock: Partial<Block>,
-		action?: "update" | "delete"
-	) => void;
 	imageFile?: File | null;
 	imagePreview?: string | null;
 }
@@ -33,7 +28,7 @@ export default function Page() {
 
 	const updateBlock = (
 		id: string,
-		newblock: Partial<Block>,
+		newblock: Partial<BlockData>,
 		action: "update" | "delete" = "update"
 	) => {
 		if (action == "update") {
@@ -49,12 +44,11 @@ export default function Page() {
 		}
 	};
 
-	const [blocks, setBlocks] = useState<Block[]>([
+	const [blocks, setBlocks] = useState<BlockData[]>([
 		{
 			id: Date.now().toString(),
 			type: "title",
 			placeholder: "Title",
-			updateBlock,
 		},
 	]);
 
@@ -73,7 +67,6 @@ export default function Page() {
 				id: Date.now().toString(),
 				type: "text",
 				placeholder: "Type something...",
-				updateBlock,
 			},
 		]);
 	};
@@ -114,10 +107,19 @@ export default function Page() {
 				{floatingToolbarState?.active && (
 					<SelectionFloatingToolbar
 						position={floatingToolbarState.position}
+						updateBlock={updateBlock}
+						blockId={floatingToolbarState.blockId}
+						blockRef={floatingToolbarState.blockRef}
 					/>
 				)}
 				{blocks.map((block) => {
-					return <Block key={block.id} {...block} />;
+					return (
+						<Block
+							key={block.id}
+							{...block}
+							updateBlock={updateBlock}
+						/>
+					);
 				})}
 				<button
 					onClick={addNewBlock}
