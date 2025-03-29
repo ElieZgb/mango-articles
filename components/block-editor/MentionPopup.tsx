@@ -5,11 +5,22 @@ import { useMentionPopupState } from "@state/mentionBlockPopup";
 import React, { useEffect, useRef, useState } from "react";
 import PlaceholderImage from "@public/assets/images/profile-placeholder.png";
 import clsx from "clsx";
+import type { BlockData } from "@app/write/page";
 
 export default function MentionPopup({
 	position,
+	updateBlock,
+	blockId,
+	blockRef,
 }: {
 	position: { x: number; y: number };
+	updateBlock: (
+		id: string,
+		newBlock: Partial<BlockData>,
+		action?: "update" | "delete"
+	) => void;
+	blockId: string | null;
+	blockRef: React.RefObject<HTMLElement | null> | null;
 }) {
 	const popupRef = useRef<HTMLDivElement>(null);
 	const { setData } = useMentionPopupState();
@@ -43,6 +54,14 @@ export default function MentionPopup({
 
 				selection.removeAllRanges();
 				selection.addRange(newRange);
+
+				if (blockId && blockRef?.current) {
+					updateBlock(
+						blockId,
+						{ textValue: blockRef.current.innerHTML },
+						"update"
+					);
+				}
 			}
 		}
 	};

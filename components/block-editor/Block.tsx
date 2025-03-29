@@ -79,7 +79,7 @@ export default function Block({
 				x: rect.left + window.scrollX,
 				y: rect.top + window.scrollY - 70,
 			},
-			blockRef: blockRef,
+			blockRef,
 			blockId: id,
 		});
 	};
@@ -190,6 +190,8 @@ export default function Block({
 									x: rect.left,
 									y: rect.top + rect.height + 20,
 								},
+								blockId: id,
+								blockRef,
 							});
 						}
 					}}

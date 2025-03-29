@@ -102,6 +102,9 @@ export default function Page() {
 				{mentionPopup?.active && (
 					<MentionPopup
 						position={mentionPopup?.position || { x: 0, y: 0 }}
+						blockRef={mentionPopup.blockRef}
+						blockId={mentionPopup.blockId}
+						updateBlock={updateBlock}
 					/>
 				)}
 				{floatingToolbarState?.active && (
