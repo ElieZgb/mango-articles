@@ -46,14 +46,35 @@ model Session {
 }
 
 model Article {
-  id           String   @id @default(uuid())
-  title        String
-  content      String
-  header_image String?
-  likes_count  Int
-  published    Boolean  @default(false) // Draft or Published
-  author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId     String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String         @id @default(uuid())
+  likes_count Int
+  published   Boolean        @default(false) // Draft or Published
+  author      User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  blocks      ArticleBlock[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ArticleBlock {
+  id           String           @id @default(uuid())
+  type         ArticleBlockType
+  textValue    String?
+  className    String?
+  placeholder  String?
+  imageFile    String?
+  imagePreview String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  article      Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId    String // Foreign key to the Article
+}
+
+enum ArticleBlockType {
+  text
+  title
+  image
+  separator
+  codeblock
+  videolink
 }
