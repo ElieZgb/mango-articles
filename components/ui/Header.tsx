@@ -24,14 +24,14 @@ export default function Header() {
 			if (doneFetching) return;
 
 			const fetchAndUpdateUser = async () => {
-				const userFetchResponse = await fetch("/api/users", {
-					method: "POST",
-					body: JSON.stringify({ email: session.user.email }),
-				});
+				const userFetchResponse = await fetch(
+					`/api/users?email=${session.user.email}`
+				);
 
 				if (!userFetchResponse.ok) return signOut();
 
 				const user = await userFetchResponse.json();
+				console.log({ user });
 
 				if (user.username) {
 					setDoneFetching(true);

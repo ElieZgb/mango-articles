@@ -1,9 +1,13 @@
 "use client";
-import { slugify } from "@lib/slugify";
-import type { Article } from "@node_modules/.prisma/client";
+import { slugify } from "@app/lib/slugify";
+import type { Article, ArticleBlock } from "@node_modules/.prisma/client";
 import Link from "@node_modules/next/link";
 import React, { useState } from "react";
 import ProfilePagination from "../paginations/ProfilePagination";
+
+interface ArticleAndBlocksType extends Article {
+	blocks?: ArticleBlock[];
+}
 
 export default function List({
 	paginated = false,
@@ -12,7 +16,7 @@ export default function List({
 }: {
 	paginated?: boolean;
 	title?: string;
-	list: Article[];
+	list: ArticleAndBlocksType[];
 }) {
 	const [currentPage] = useState(0);
 
@@ -21,6 +25,11 @@ export default function List({
 			{title && <h3 className="text-[#777] font-bold mb-1">{title}</h3>}
 			<div className="">
 				{list.map((article, index) => {
+					console.log(article);
+					const title =
+						article?.blocks?.find((block) => block.type == "title")
+							?.textValue || "Title";
+
 					return (
 						<div
 							key={index}
@@ -32,12 +41,12 @@ export default function List({
 							<div className="mr-3 flex-1 hover:underline relative">
 								<Link
 									href={`/article/${slugify(
-										article.title!,
-										article.id!
+										title,
+										article.id
 									)}`}
 									className="absolute top-0 left-0 w-full h-full"
 								/>
-								{article.title}
+								{title}
 							</div>
 
 							<div className="text-sm relative bottom-[2px]">
@@ -47,7 +56,13 @@ export default function List({
 					);
 				})}
 
-				{paginated && <ProfilePagination currentPage={currentPage} />}
+				{paginated && (
+					<ProfilePagination
+						currentPage={currentPage}
+						itemPerPage={3}
+						totalItems={list.length}
+					/>
+				)}
 			</div>
 		</div>
 	);

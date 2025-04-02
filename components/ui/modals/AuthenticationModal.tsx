@@ -21,8 +21,9 @@ import {
 import { useRouter } from "@node_modules/next/navigation";
 import { signInSchema, type SignInSchema } from "@schema/signInSchema";
 import { type SignUpSchema, signUpSchema } from "@schema/signUpSchema";
-import { checkUsernameAvailability } from "@lib/checkUsernameAvailability";
+import { checkUsernameAvailability } from "@app/lib/checkUsernameAvailability";
 import { Loader2, CircleCheck, XCircle } from "lucide-react";
+import { useRegisterUser } from "@app/lib/useRegisterUser";
 
 export default function AuthenticationModal() {
 	const [hidden, setHidden] = useState(true);
@@ -215,6 +216,7 @@ const RegisterUI = ({ setModalData, title }: FormProps) => {
 	});
 	const router = useRouter();
 	const usernameInput = watch("username");
+	const { mutateAsync } = useRegisterUser();
 
 	useEffect(() => {
 		setLoading(false);
@@ -244,28 +246,9 @@ const RegisterUI = ({ setModalData, title }: FormProps) => {
 		}
 
 		try {
-			const res = await fetch("/api/auth/register", {
-				method: "POST",
-				body: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-
-			if (!res.ok)
-				throw new Error(`Something went wrong: ${res.statusText}`);
-
-			const signUpInfo = await res.json();
-
-			if (res.status === 200) {
-				await signIn("credentials", {
-					email: data.email,
-					password: data.password,
-					redirect: false,
-				});
-				router.push("/");
-				setModalData({ isOpen: false });
-			} else throw new Error(signUpInfo);
+			await mutateAsync(data);
+			router.push("/");
+			setModalData({ isOpen: false });
 		} catch (e) {
 			console.log("Error signing up", e);
 		}

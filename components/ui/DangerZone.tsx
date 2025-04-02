@@ -2,18 +2,37 @@
 import React, { useState } from "react";
 import { useRouter } from "@node_modules/next/navigation";
 import { Loader2 } from "lucide-react";
+import { signOut, useSession } from "@node_modules/next-auth/react";
 
 export default function DangerZone() {
 	const router = useRouter();
 	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [deleteAccountModal, setDeleteAccountModal] = useState(false);
+	const { data: sessionData } = useSession();
 
-	const handleDeleteAccount = () => {
+	const handleDeleteAccount = async () => {
 		setDeletingAccount(true);
 
-		setTimeout(() => {
-			router.push("/");
-		}, 3000);
+		if (sessionData) {
+			try {
+				const res = await fetch(
+					`/api/users?email=${sessionData?.user.email}`,
+					{
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+				const data = await res.json();
+				console.log(data);
+				signOut({ callbackUrl: "/" });
+			} catch (e) {
+				console.log("Error deleting user", e);
+			} finally {
+				setDeletingAccount(false);
+			}
+		}
 	};
 
 	return (

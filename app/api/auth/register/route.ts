@@ -1,4 +1,4 @@
-import { db } from "@lib/prisma";
+import { db } from "@app/lib/prisma";
 import { NextResponse } from "@node_modules/next/server";
 import { signUpSchema } from "@schema/signUpSchema";
 import bcrypt from "bcrypt";

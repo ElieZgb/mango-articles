@@ -5,7 +5,7 @@ import CredentialsProvider from "@node_modules/next-auth/providers/credentials";
 import { getServerSession } from "@node_modules/next-auth";
 import type { AuthOptions } from "@node_modules/next-auth";
 import { PrismaAdapter } from "@node_modules/@next-auth/prisma-adapter";
-import { db } from "@lib/prisma";
+import { db } from "@app/lib/prisma";
 import bcrypt from "bcrypt";
 import { Adapter } from "@node_modules/next-auth/adapters";
 
@@ -171,9 +171,6 @@ export const authOptions: AuthOptions = {
 			}
 
 			return false; // user.email is missing
-		},
-		async redirect() {
-			return "/";
 		},
 	},
 };

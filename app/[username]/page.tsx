@@ -2,24 +2,26 @@
 import React, { useEffect, useRef, useState } from "react";
 import PlaceholderProfile from "@public/assets/images/profile-placeholder.png";
 import Image from "@node_modules/next/image";
-import { useRouter, useParams } from "@node_modules/next/navigation";
+import { useParams } from "@node_modules/next/navigation";
 import { PenBox, ListMinus, FileHeart, Loader2, Pencil } from "lucide-react";
 import DigitsStatisticsCard from "@components/ui/statistics/DigitsStatisticsCard";
-import { articles } from "@dummy/articles";
 import { useSession } from "@node_modules/next-auth/react";
-import type { User } from "@node_modules/@prisma/client";
-import { getTotalLikes } from "@lib/userStats";
-import DangerZone from "@components/ui/DangerZone";
+import type { Article, User } from "@node_modules/@prisma/client";
+import { getTotalLikes } from "@app/lib/userStats";
 import List from "@components/ui/lists/List";
 import LoadingIcon from "@public/assets/icons/loading-icon.gif";
+import { useUploadImage } from "@app/lib/uploadImage";
+import { useFetchUserByUsername } from "@app/lib/fetchUsers";
+import { useUpdateUser } from "@app/lib/updateUsers";
 
 export default function Page() {
-	const router = useRouter();
-	const { username: usernameParams } = useParams();
+	const { username } = useParams();
 	const { data: session, status: sessionStatus } = useSession();
 	const [totalPosts, setTotalPosts] = useState<number>(0);
 	const [totalLikes, setTotalLikes] = useState<number>(0);
-	const [user, setUser] = useState<User | null>(null);
+	const [user, setUser] = useState<(User & { articles: Article[] }) | null>(
+		null
+	);
 	const [canEdit, setCanEdit] = useState<boolean>(false);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [nameInput, setNameInput] = useState<string | null>("");
@@ -32,7 +34,9 @@ export default function Page() {
 	const [profilePreview, setProfilePreview] = useState<string | null>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const [uploadingImage, setUploadingImage] = useState<boolean>(false);
-	// const [userImage, setUserImage] = useState<string | null>(null);
+	const { mutateAsync } = useUploadImage();
+	const { data } = useFetchUserByUsername(username as string);
+	const { mutateAsync: updateUserAsync } = useUpdateUser();
 
 	useEffect(() => {
 		if (nameEditable) {
@@ -51,27 +55,18 @@ export default function Page() {
 	}, [nameEditable, bioEditable]);
 
 	useEffect(() => {
-		const fetchUser = async () => {
-			const res = await fetch(`/api/users/${usernameParams}`);
-			if (res.status != 200) {
-				router.push("/");
-				return;
-			}
-
-			const data = await res.json();
-			const userLoggedIn = await isUserLoggedIn(data);
+		if (data) {
+			const userLoggedIn = isUserLoggedIn(data);
 			setCanEdit(userLoggedIn);
 			setUser(data);
 			setNameInput(data.name);
 			setBioInput(data.bio);
 			setTotalPosts(data.articles.length);
 			setTotalLikes(getTotalLikes(data.articles));
-		};
+		}
+	}, [username, session, data]);
 
-		fetchUser();
-	}, [usernameParams, session]);
-
-	const isUserLoggedIn = async (data: User): Promise<boolean> => {
+	const isUserLoggedIn = (data: User) => {
 		if (sessionStatus != "authenticated") return false;
 
 		if (session.user.email === data.email) return true;
@@ -87,20 +82,21 @@ export default function Page() {
 		}
 		newImageURL = newImageURL ? newImageURL : user?.image;
 
-		const updateRes = await fetch(`/api/users/${usernameParams}`, {
-			method: "PUT",
-			body: JSON.stringify({
-				name: nameInput,
-				bio: bioInput,
-				image: newImageURL,
-			}),
-		});
-		const updatedUser = await updateRes.json();
-		setUser(updatedUser);
-		setIsUpdating(false);
-		setSaveChanges(false);
-		setBioEditable(false);
-		setNameEditable(false);
+		try {
+			const updatedUser = await updateUserAsync({
+				username: username as string,
+				bioInput,
+				nameInput,
+				newImageURL: newImageURL ?? null,
+			});
+			setUser(updatedUser);
+			setIsUpdating(false);
+			setSaveChanges(false);
+			setBioEditable(false);
+			setNameEditable(false);
+		} catch (e) {
+			console.log("Error updating user", e);
+		}
 	};
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,22 +118,10 @@ export default function Page() {
 
 		setUploadingImage(true);
 		try {
-			const formData = new FormData();
-			formData.append("file", file);
-			formData.append("fileName", file.name);
-			formData.append("folder", "/profiles");
-
-			const response = await fetch("/api/image-upload", {
-				method: "POST",
-				body: formData,
-			});
-
-			if (!response.ok) return;
-
-			const data = await response.json();
-			return data.url;
-		} catch (error) {
-			console.error("Error uploading image:", error);
+			const imageUrl = await mutateAsync({ file, folder: "/profiles" });
+			return imageUrl;
+		} catch (e) {
+			console.log("Error uploading image", e);
 		} finally {
 			setUploadingImage(false);
 		}
@@ -240,7 +224,7 @@ export default function Page() {
 								)}
 							</div>
 							<div className="text-[#666] text-base mb-1">
-								elienzgheib@gmail.com | eliezgb
+								{user.email} | {username}
 							</div>
 						</div>
 						{saveChanges && (
@@ -324,16 +308,17 @@ export default function Page() {
 				{/* Top 3 Articles By Likes */}
 				<List
 					title="Top 3 Articles"
-					list={articles.sort(
-						(a, b) => b.likes_count! - a.likes_count!
-					)}
+					list={user.articles
+						.sort((a, b) => b.likes_count! - a.likes_count!)
+						.slice(0, 3)}
 				/>
 
 				{/* All Articles */}
-				<List title="All Articles" list={articles} paginated={true} />
-
-				{/* Danger Zone */}
-				<DangerZone />
+				<List
+					title="All Articles"
+					list={user.articles}
+					paginated={true}
+				/>
 			</div>
 		</div>
 	);

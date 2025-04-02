@@ -1,40 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import type { User } from "@node_modules/@prisma/client";
+import React from "react";
 import AsideCard from "@components/ui/cards/AsideCard";
 import AsideCardSkeleton from "@components/ui/cards/AsideCardSkeleton";
-import { slugify } from "@lib/slugify";
-
-interface DataState {
-	title: string;
-	id: string;
-	content: string;
-	header_image: string | null;
-	likes_count: number;
-	published: boolean;
-	createdAt: Date;
-	updatedAt: Date;
-	author: User;
-}
+import { slugify } from "@app/lib/slugify";
+import { useQuery } from "@node_modules/@tanstack/react-query";
+import { fetchArticles } from "@app/lib/fetchArticles";
 
 export default function FeedAside() {
-	const [data, setData] = useState<DataState[] | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["articles"],
+		queryFn: fetchArticles,
+		staleTime: 1000 * 60 * 5,
+	});
 
-	useEffect(() => {
-		const fetchArticles = async () => {
-			const result = await fetch("/api/articles");
-			const data = await result.json();
-			setData(data.popular_articles);
-			setLoading(false);
-		};
-
-		if (!data) {
-			fetchArticles();
-		}
-	}, []);
-
-	if (loading) {
+	if (isLoading) {
 		return (
 			<aside className="max-[900px]:hidden w-[30vw] min-w-[250px] max-w-[400px] border-l-[1px] border-black py-5 px-5">
 				<h1 className="text-lg mb-2">Popular Articles</h1>
@@ -45,19 +24,29 @@ export default function FeedAside() {
 		);
 	}
 
+	if (error) {
+		return <div className="text-red-500">Error fetching articles</div>;
+	}
+
 	return (
 		<aside className="max-[900px]:hidden w-[30vw] min-w-[250px] max-w-[400px] border-l-[1px] border-black py-5 px-5">
 			<h1 className="text-lg mb-2">Popular Articles</h1>
-			{data?.map((article, index) => {
+			{data.popular_articles?.map((article, index: number) => {
+				const title =
+					article.blocks.find((block) => block.type == "title")
+						?.textValue || "Title";
 				return (
 					<AsideCard
 						key={index}
-						title={article.title}
-						content={article.content}
-						likes_count={article.likes_count}
+						title={title}
+						content={
+							article.blocks.find((block) => block.type == "text")
+								?.textValue
+						}
+						likes={article.likes_count}
 						updatedAt={article.updatedAt}
 						author={article.author}
-						slug={slugify(article.title, article.id)}
+						slug={slugify(title, article.id)}
 					/>
 				);
 			})}

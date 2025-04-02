@@ -1,4 +1,4 @@
-import { db } from "@lib/prisma";
+import { db } from "@app/lib/prisma";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -15,7 +15,13 @@ export async function GET(request: NextRequest) {
 	try {
 		const user = await db.user.findUnique({
 			where: { username },
-			include: { articles: true },
+			include: {
+				articles: {
+					include: {
+						blocks: true,
+					},
+				},
+			},
 		});
 
 		if (user) {

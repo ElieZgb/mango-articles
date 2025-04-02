@@ -23,7 +23,7 @@ export default function BlockTooltipControl({
 }: {
 	updateBlock: (
 		id: string,
-		newBlock: Partial<BlockData>,
+		newBlock: Partial<BlockData> & { imageFileTemp?: File },
 		action?: "update" | "delete"
 	) => void;
 	visible: boolean;
@@ -86,7 +86,7 @@ export default function BlockTooltipControl({
 		reader.onloadend = () => {
 			if (blockId) {
 				updateBlock(blockId, {
-					imageFile: selectedFile,
+					imageFileTemp: selectedFile,
 					imagePreview: reader.result as string,
 					type: "image",
 					placeholder: undefined,

@@ -26,6 +26,7 @@ export default function Block({
 	placeholder,
 	updateBlock,
 	imagePreview,
+	textValue,
 }: BlockProps) {
 	const blockRef = useRef<HTMLElement>(null);
 	const labelRef = useRef<HTMLLabelElement>(null);
@@ -49,6 +50,10 @@ export default function Block({
 				position: { x: X, y: Y + height / 2 },
 				blockId: id,
 			});
+
+			blockRef.current.innerHTML = textValue;
+			if (textValue.length > 0 && labelRef.current)
+				labelRef.current.style.display = "none";
 		}
 	}, [blockRef]);
 
@@ -301,6 +306,7 @@ export default function Block({
 							type,
 							id,
 							textValue: target.value,
+							codeLanguage: codeLanguage,
 						});
 					}}
 				></textarea>

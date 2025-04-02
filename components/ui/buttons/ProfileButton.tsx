@@ -4,7 +4,7 @@ import { signOut, useSession } from "@node_modules/next-auth/react";
 import Image from "@node_modules/next/image";
 import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
 import ProfileButtonTile from "../tiles/ProfileButtonTile";
-import { User, Pencil, BookText, Settings } from "lucide-react";
+import { User, Pencil, Settings } from "lucide-react";
 import Divider from "../tiles/Divider";
 import clsx from "@node_modules/clsx";
 import type { Session } from "next-auth";
@@ -93,16 +93,18 @@ const BurgerMenu = ({
 				closeMenu={closeMenu}
 				icon={Pencil}
 				label="Write"
+				url="/write"
 			/>
-			<ProfileButtonTile
+			{/* <ProfileButtonTile
 				closeMenu={closeMenu}
 				icon={BookText}
 				label="Stories"
-			/>
+			/> */}
 			<ProfileButtonTile
 				closeMenu={closeMenu}
 				icon={Settings}
 				label="Settings"
+				url="/settings"
 			/>
 			<Divider marginVertical={13} color="#ccc" />
 			<ProfileButtonTile

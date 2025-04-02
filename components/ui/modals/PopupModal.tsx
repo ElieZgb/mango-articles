@@ -3,7 +3,7 @@ import { useUsernamePopupState } from "@state/usernamePopup";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
-import { checkUsernameAvailability } from "@lib/checkUsernameAvailability";
+import { checkUsernameAvailability } from "@app/lib/checkUsernameAvailability";
 
 export default function PopupModal() {
 	const [loading, setLoading] = useState<boolean>(false);
@@ -12,6 +12,7 @@ export default function PopupModal() {
 	const [hidden, setHidden] = useState(true);
 	const { data: popupState, setData: setPopupState } =
 		useUsernamePopupState();
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (popupState?.isOpen) {
@@ -51,10 +52,15 @@ export default function PopupModal() {
 
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
+		setIsSubmitting(true);
 
 		const email = popupState?.email;
 
-		if (!success || !email) return setPopupState({ isOpen: false });
+		if (!success || !email) {
+			setIsSubmitting(false);
+			setPopupState({ isOpen: false });
+			return;
+		}
 
 		const userUpdateResponse = await fetch("/api/users", {
 			method: "PATCH",
@@ -67,6 +73,7 @@ export default function PopupModal() {
 		const updatedUser = await userUpdateResponse.json();
 		console.log({ updatedUser });
 		setPopupState({ isOpen: false, email: null });
+		setIsSubmitting(false);
 	};
 
 	if (hidden) {
@@ -116,11 +123,22 @@ export default function PopupModal() {
 							This username is available!
 						</div>
 					)}
-					<input
-						className="block pt-2 pb-1 mt-2 text-center bg-white text-black border-[1.5px] border-black w-full rounded-sm cursor-pointer"
-						type="submit"
-						value="Next"
-					/>
+					<div className="relative flex items-center justify-center">
+						<input
+							className={clsx(
+								"block pt-2 pb-1 mt-2 text-center bg-white border-[1.5px] border-black w-full rounded-sm cursor-pointer",
+								isSubmitting ? "text-transparent" : "text-black"
+							)}
+							type="submit"
+							value="Next"
+						/>
+						{isSubmitting && (
+							<Loader2
+								size={20}
+								className="absolute top-[38%] animate-spin"
+							/>
+						)}
+					</div>
 				</form>
 			</div>
 		</div>

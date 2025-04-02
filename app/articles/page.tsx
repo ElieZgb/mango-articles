@@ -1,40 +1,36 @@
 "use client";
 import ArticleFeedCard from "@components/ui/cards/ArticleFeedCard";
 import ArticleFeedCardSkeleton from "@components/ui/cards/ArticleFeedCardSkeleton";
-import { slugify } from "@lib/slugify";
-import type { User } from "@node_modules/@prisma/client";
-import React, { useEffect, useState } from "react";
+import { fetchArticles } from "@app/lib/fetchArticles";
+import { slugify } from "@app/lib/slugify";
+import type { ArticleBlock, User } from "@node_modules/@prisma/client";
+import { useQuery } from "@node_modules/@tanstack/react-query";
+import React from "react";
 
-interface DataState {
-	title: string;
+export interface DataState {
 	id: string;
-	content: string;
-	header_image: string | null;
 	likes_count: number;
+	title: string;
 	published: boolean;
+	author: User;
+	authorId: string;
+	blocks: ArticleBlock[];
 	createdAt: Date;
 	updatedAt: Date;
-	author: User;
 }
 
 export default function Page() {
-	const [data, setData] = useState<DataState[] | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["articles"],
+		queryFn: fetchArticles,
+		staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+	});
 
-	useEffect(() => {
-		const fetchArticles = async () => {
-			const result = await fetch("/api/articles");
-			const data = await result.json();
-			setData(data.total_articles);
-			setLoading(false);
-		};
+	if (error) {
+		return <div>Error: {error.message}</div>;
+	}
 
-		if (!data) {
-			fetchArticles();
-		}
-	}, []);
-
-	if (loading) {
+	if (isLoading) {
 		return (
 			<div className="px-8 py-5">
 				<ArticleFeedCardSkeleton index={0} />
@@ -46,17 +42,28 @@ export default function Page() {
 
 	return (
 		<div className="px-8 py-5">
-			{data?.map((article, index) => {
+			{data.total_articles?.map((article: DataState, index: number) => {
+				const title =
+					article.blocks.find((block) => block.type == "title")
+						?.textValue || "Title";
+
 				return (
 					<ArticleFeedCard
 						key={index}
-						content={article.content}
+						content={
+							article.blocks.find((block) => block.type == "text")
+								?.textValue
+						}
 						likes={article.likes_count}
 						updatedAt={article.updatedAt}
-						title={article.title}
+						title={title}
 						author={article.author}
-						image={article.header_image}
-						slug={slugify(article.title, article.id)}
+						header_image={
+							article.blocks.find(
+								(block) => block.type == "image"
+							)?.imagePreview || ""
+						}
+						slug={slugify(title, article.id)}
 					/>
 				);
 			})}

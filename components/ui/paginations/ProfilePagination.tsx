@@ -4,8 +4,12 @@ import React from "react";
 
 export default function ProfilePagination({
 	currentPage,
+	itemPerPage,
+	totalItems,
 }: {
 	currentPage: number;
+	itemPerPage: number;
+	totalItems: number;
 }) {
 	return (
 		<div className="flex items-center justify-center mt-5">
@@ -19,7 +23,7 @@ export default function ProfilePagination({
 						<ChevronLeft size={20} />
 					</a>
 				</li>
-				{Array(5)
+				{Array(Math.ceil(totalItems / itemPerPage))
 					.fill(0)
 					.map((el, index) => (
 						<li key={index}>

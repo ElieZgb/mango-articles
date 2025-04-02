@@ -1,5 +1,5 @@
 "use client";
-import { formatDate } from "@lib/dateFormat";
+import { formatDate } from "@app/lib/dateFormat";
 import { Share, PenTool } from "lucide-react";
 import PDFIcon from "@public/assets/icons/pdf-icon.svg";
 import Image from "@node_modules/next/image";
@@ -10,6 +10,7 @@ import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
 import { useSession } from "@node_modules/next-auth/react";
 import LikeAnimation from "@public/assets/lottie/like-animation.json";
 import Lottie, { type LottieRefCurrentProps } from "lottie-react";
+import { useRouter } from "@node_modules/next/navigation";
 
 interface ArticleHeaderProps {
 	title: string;
@@ -32,6 +33,7 @@ export default function ArticleHeader({
 	const [likesCount, setLikesCount] = useState<number>(likes);
 	const [likeTimeout, setLikeTimeout] = useState<NodeJS.Timeout | null>(null);
 	const [clicked, setclicked] = useState<boolean>(false);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (lottieRef.current) {
@@ -124,7 +126,13 @@ export default function ArticleHeader({
 					/>
 					{sessionStatus === "authenticated" &&
 						session.user.email === author.email && (
-							<PenTool size={20} className="cursor-pointer" />
+							<PenTool
+								onClick={() => {
+									router.push(`/write/${articleID}`);
+								}}
+								size={20}
+								className="cursor-pointer"
+							/>
 						)}
 				</div>
 			</div>

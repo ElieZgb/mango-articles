@@ -4,7 +4,7 @@ import Image from "@node_modules/next/image";
 import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "@node_modules/next/link";
-import { deslugify, slugify } from "@lib/slugify";
+import { deslugify, slugify } from "@app/lib/slugify";
 import { usePathname } from "@node_modules/next/navigation";
 import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
 
@@ -16,11 +16,7 @@ export default function AuthorSideBar({ author }: { author: User }) {
 	useEffect(() => {
 		const fetchAuthorArticles = async () => {
 			setLoading(true);
-			const res = await fetch("/api/articles", {
-				method: "POST",
-				body: JSON.stringify({ authorId: author.id }),
-			});
-
+			const res = await fetch(`/api/articles?authorId=${author.id}`);
 			const data = await res.json();
 			const { id } = deslugify(pathname.split("/")[2]);
 			setAuthorArticles(
@@ -88,14 +84,14 @@ export default function AuthorSideBar({ author }: { author: User }) {
 						{!loading &&
 							authorArticles.map((article, index) => (
 								<li className="text-xs font-bold" key={index}>
-									<Link
+									{/* <Link
 										href={`/article/${slugify(
 											article.title,
 											article.id
 										)}`}
 									>
 										{article.title}
-									</Link>
+									</Link> */}
 								</li>
 							))}
 					</ul>

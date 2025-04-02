@@ -16,7 +16,7 @@ export default function LanguageSelector({
 		<div>
 			<button
 				onClick={() => {
-					setOpen(true);
+					setOpen((prev) => !prev);
 				}}
 				className="flex items-center gap-1 cursor-pointer"
 			>

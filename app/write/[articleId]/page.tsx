@@ -1,80 +1,49 @@
 "use client";
-import Block from "@components/block-editor/Block";
 import React, { useEffect, useState } from "react";
+import type { BlockData } from "../page";
+import { useParams } from "@node_modules/next/navigation";
+import Block from "@components/block-editor/Block";
 import { Loader2, Plus, Send } from "lucide-react";
+import { useBlockTooltipState } from "@state/blockTooltipControl";
 import BlockTooltipControl from "@components/block-editor/BlockTooltipControl";
-import SelectionFloatingToolbar from "@components/block-editor/SelectionFloatingToolbar";
 import MentionPopup from "@components/block-editor/MentionPopup";
 import { useMentionPopupState } from "@state/mentionBlockPopup";
-import { useBlockTooltipState } from "@state/blockTooltipControl";
 import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
-import { useSession } from "@node_modules/next-auth/react";
+import SelectionFloatingToolbar from "@components/block-editor/SelectionFloatingToolbar";
 import clsx from "clsx";
-import { useRouter } from "@node_modules/next/navigation";
-import { useUploadImage } from "@app/lib/uploadImage";
-
-export interface BlockData {
-	id: string;
-	type: "text" | "title" | "image" | "separator" | "codeblock" | "videolink";
-	textValue: string;
-	className?: string;
-	placeholder?: string;
-	imagePreview?: string | null;
-	codeLanguage?: string | null;
-	imageFileTemp?: File;
-}
+import Image from "@node_modules/next/image";
+import LoadingIcon from "@public/assets/icons/loading-icon.gif";
+import { useSession } from "@node_modules/next-auth/react";
 
 export default function Page() {
-	const router = useRouter();
+	const [blocks, setBlocks] = useState<BlockData[]>([]);
+	const { articleId } = useParams();
 	const { data: tooltipState, setData: setBlockTooltip } =
 		useBlockTooltipState();
+	const { data: mentionPopup } = useMentionPopupState();
 	const { data: floatingToolbarState, setData: setFloatingToolbar } =
 		useSelectionFloatingToolbarState();
-	const { data: mentionPopup } = useMentionPopupState();
-	const { mutateAsync } = useUploadImage();
-	const [blocks, setBlocks] = useState<BlockData[]>([
-		{
-			id: Date.now().toString(),
-			type: "title",
-			placeholder: "Title",
-			textValue: "",
-		},
-	]);
-	const { data: sessionData } = useSession();
 	const [isPublishing, setIsPublishing] = useState<boolean>(false);
-
-	const updateBlock = (
-		id: string,
-		newblock: Partial<BlockData>,
-		action: "update" | "delete" = "update"
-	) => {
-		if (action == "update") {
-			setBlocks((prevBlocks) =>
-				prevBlocks.map((block) =>
-					block.id === id ? { ...block, ...newblock } : block
-				)
-			);
-		} else if (action == "delete") {
-			setBlocks((prevBlocks) =>
-				prevBlocks.filter((block) => block.id !== id)
-			);
-		}
-	};
-
-	const addNewBlock = () => {
-		setBlocks([
-			...blocks,
-			{
-				id: Date.now().toString(),
-				type: "text",
-				placeholder: "Type something...",
-				textValue: "",
-			},
-		]);
-	};
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const { data: sessionData } = useSession();
 
 	useEffect(() => {
-		setBlockTooltip({ blockId: blocks[0].id });
+		setIsLoading(true);
+		const fetchArticle = async () => {
+			const response = await fetch(`/api/articles/${articleId}`);
+			const data = await response.json();
+			setBlocks(data.blocks);
+			setIsLoading(false);
+			console.log(data.blocks);
+		};
+
+		fetchArticle();
+	}, [articleId]);
+
+	useEffect(() => {
+		if (blocks.length > 0) {
+			setBlockTooltip({ blockId: blocks[0].id });
+		}
 
 		const handleSelectionChange = () => {
 			const selection = window.getSelection();
@@ -94,15 +63,39 @@ export default function Page() {
 		};
 	}, []);
 
-	const publishArticle = async () => {
+	const addNewBlock = () => {
+		setBlocks([
+			...blocks,
+			{
+				id: Date.now().toString(),
+				type: "text",
+				placeholder: "Type something...",
+				textValue: "",
+			},
+		]);
+	};
+
+	const updateBlock = (
+		id: string,
+		newblock: Partial<BlockData>,
+		action: "update" | "delete" = "update"
+	) => {
+		if (action == "update") {
+			setBlocks((prevBlocks) =>
+				prevBlocks.map((block) =>
+					block.id === id ? { ...block, ...newblock } : block
+				)
+			);
+		} else if (action == "delete") {
+			setBlocks((prevBlocks) =>
+				prevBlocks.filter((block) => block.id !== id)
+			);
+		}
+	};
+
+	const updateArticle = async () => {
 		const filtereBlocks = blocks.filter(
-			(block) =>
-				(block.textValue.length > 0 && block.type === "text") ||
-				(block.textValue.length > 0 && block.type === "title") ||
-				(block.textValue.length > 0 && block.type === "codeblock") ||
-				block.type == "image" ||
-				block.type == "videolink" ||
-				block.type == "separator"
+			(block) => block.textValue.length > 0
 		);
 
 		if (filtereBlocks.length == 0) return;
@@ -123,54 +116,41 @@ export default function Page() {
 			return;
 		}
 
-		console.log("publishing...");
+		if (sessionData && !sessionData.user.id)
+			return alert("You are nto signed in");
+
 		setIsPublishing(true);
-
-		const updatedBlocks = await Promise.all(
-			filtereBlocks.map(async (block) => {
-				if (block.type === "image" && block.imageFileTemp) {
-					try {
-						const imageUrl = await mutateAsync({
-							file: block.imageFileTemp,
-							folder: "/previews",
-						});
-						return {
-							...block,
-							imagePreview: imageUrl,
-						};
-						// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					} catch (e) {
-						return block;
-					}
-				}
-				return block;
-			})
-		);
-
 		try {
-			setIsPublishing(true);
-			const res = await fetch(`/api/articles`, {
-				method: "POST",
+			await fetch(`/api/articles/${articleId}?body=true`, {
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					blocks: updatedBlocks,
-					authorId: sessionData?.user.id,
+					blocks,
 				}),
 			});
-			const data = await res.json();
-			console.log(data);
-			router.push("/articles");
 		} catch (e) {
-			console.log("Error publishing", e);
-			alert(
-				`Something went wrong publishing the article...\n Error: ${e}`
-			);
+			console.log("Error updating article", e);
+			alert("Error updating article!");
 		} finally {
 			setIsPublishing(false);
 		}
 	};
+
+	if (!blocks || isLoading)
+		return (
+			<div className="h-screen">
+				<div className="w-12 mx-auto mt-[30vh] aspect-square relative">
+					<Image
+						src={LoadingIcon}
+						fill={true}
+						alt="Loading"
+						className="object-contain"
+					/>
+				</div>
+			</div>
+		);
 
 	return (
 		<div className="flex justify-center">
@@ -215,13 +195,13 @@ export default function Page() {
 						<Plus size={15} className="relative bottom-[1px]" />
 					</button>
 					<button
-						onClick={publishArticle}
+						onClick={updateArticle}
 						className={clsx(
 							"relative flex items-center justify-center gap-1 bg-mango/30 cursor-pointer px-10 w-full mx-auto mt-5 py-1 rounded-lg hover:text-[#444]",
 							"text-[#888]"
 						)}
 					>
-						{isPublishing ? "Publishing" : "Publish"}
+						{isPublishing ? "Updating article" : "Update article"}
 						{!isPublishing && (
 							<Send size={15} className="relative bottom-[1px]" />
 						)}

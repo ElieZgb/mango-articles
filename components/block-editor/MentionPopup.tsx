@@ -1,11 +1,13 @@
 "use client";
-import type { User } from "@node_modules/.prisma/client";
 import Image from "@node_modules/next/image";
 import { useMentionPopupState } from "@state/mentionBlockPopup";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import PlaceholderImage from "@public/assets/images/profile-placeholder.png";
 import clsx from "clsx";
 import type { BlockData } from "@app/write/page";
+import { useQuery } from "@node_modules/@tanstack/react-query";
+import { fetchUsers } from "@app/lib/fetchUsers";
+import type { User } from "@node_modules/.prisma/client";
 
 export default function MentionPopup({
 	position,
@@ -24,7 +26,15 @@ export default function MentionPopup({
 }) {
 	const popupRef = useRef<HTMLDivElement>(null);
 	const { setData } = useMentionPopupState();
-	const [users, setUsers] = useState<User[]>([]);
+	const {
+		data: users,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ["users"],
+		queryFn: fetchUsers,
+		staleTime: 1000 * 60 * 5,
+	});
 
 	const insertTextAtCaret = (mentionText: string) => {
 		const selection = window.getSelection();
@@ -67,14 +77,6 @@ export default function MentionPopup({
 	};
 
 	useEffect(() => {
-		const fetchUsers = async () => {
-			const response = await fetch("/api/users");
-			const responseData = await response.json();
-			setUsers(responseData);
-		};
-
-		fetchUsers();
-
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
 				popupRef.current &&
@@ -89,6 +91,26 @@ export default function MentionPopup({
 			document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
+	if (error) {
+		return <div className="text-red-500">Error fetching users</div>;
+	}
+
+	if (isLoading) {
+		<div
+			ref={popupRef}
+			style={{ left: position.x, top: position.y }}
+			className="absolute z-10"
+		>
+			<div className="w-fit max-h-[300px] bg-white overflow-auto flex flex-col rounded-sm shadow-[0px_1px_7px_5px_#eee]">
+				<div className="p-5">
+					<UserSkeleton index={1} />
+					<UserSkeleton index={2} />
+					<UserSkeleton index={3} />
+				</div>
+			</div>
+		</div>;
+	}
+
 	return (
 		<div
 			ref={popupRef}
@@ -96,14 +118,7 @@ export default function MentionPopup({
 			className="absolute z-10"
 		>
 			<div className="w-fit max-h-[300px] bg-white overflow-auto flex flex-col rounded-sm shadow-[0px_1px_7px_5px_#eee]">
-				{users.length == 0 && (
-					<div className="p-5">
-						<UserSkeleton index={1} />
-						<UserSkeleton index={2} />
-						<UserSkeleton index={3} />
-					</div>
-				)}
-				{users.map((user, index) => {
+				{users?.map((user: User, index: number) => {
 					return (
 						<button
 							onClick={() => {

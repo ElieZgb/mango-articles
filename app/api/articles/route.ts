@@ -1,10 +1,35 @@
 import { NextResponse } from "@node_modules/next/server";
-import { db } from "@lib/prisma";
+import { db } from "@app/lib/prisma";
+import type { ArticleBlock } from "@node_modules/.prisma/client";
 
-export async function GET() {
+export async function GET(req: Request) {
 	try {
+		const url = new URL(req.url);
+		const authorId = url.searchParams.get("authorId");
+		const authorEmail = url.searchParams.get("email");
+
+		if (authorId) {
+			// Fetch articles by specific author id
+			const articles = await db.article.findMany({
+				where: { authorId },
+				orderBy: { updatedAt: "desc" },
+				include: { blocks: true, author: true },
+			});
+			return NextResponse.json(articles, { status: 200 });
+		}
+
+		if (authorId) {
+			// Fetch articles by specific author email
+			const articles = await db.article.findMany({
+				where: { author: { email: authorEmail } },
+				orderBy: { updatedAt: "desc" },
+				include: { blocks: true, author: true },
+			});
+			return NextResponse.json(articles, { status: 200 });
+		}
+
 		const total_articles = await db.article.findMany({
-			include: { author: true },
+			include: { author: true, blocks: true },
 			orderBy: { updatedAt: "desc" },
 		});
 
@@ -19,22 +44,43 @@ export async function GET() {
 			{ status: 200 }
 		);
 	} catch (e) {
+		console.log(e);
 		return NextResponse.json(`Error: ${e}`, { status: 500 });
 	}
 }
 
-// fetchArticlesByAuthorId
-export async function POST(req: Request) {
-	try {
-		const { authorId } = await req.json();
+// create a new article
+export async function POST(request: Request) {
+	const { authorId, blocks } = await request.json();
 
-		const articles = await db.article.findMany({
-			where: { authorId },
-			orderBy: { updatedAt: "desc" },
+	try {
+		const article = await db.article.create({
+			data: {
+				author: {
+					connect: { id: authorId },
+				},
+				blocks: {
+					create: blocks.map((block: Partial<ArticleBlock>) => {
+						return {
+							...block,
+							type: block.type || "text",
+							textValue: block.textValue || "",
+							createdAt: new Date(),
+							updatedAt: new Date(),
+						};
+					}),
+				},
+				likes_count: 0,
+				published: true,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
 		});
 
-		return NextResponse.json(articles, { status: 200 });
+		return NextResponse.json(article, { status: 200 });
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (e) {
-		return NextResponse.json(`Error: ${e}`, { status: 500 });
+		console.log(e);
+		return NextResponse.json(e, { status: 500 });
 	}
 }
