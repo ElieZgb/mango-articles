@@ -58,9 +58,9 @@ export default function ArticleFeedCard({
 	content: string | null | undefined;
 }) {
 	return (
-		<div className="mb-5 flex max-w-[1000px] relative rounded-lg overflow-hidden bg-white shadow-lg">
+		<div className="mb-5 flex max-w-[1000px] relative rounded-lg overflow-hidden bg-white shadow-lg group group/background">
 			{/* <div className="mb-5 flex max-w-[1000px] relative rounded-lg overflow-hidden bg-white border-black border-[1px]"> */}
-			<div className="flex-1 p-8 relative z-10 bg-mango/87">
+			<div className="flex-1 p-8 relative z-10 bg-gradient-to-r from-mango/75 via-mango/75 to-mango/75 group-hover/background:to-mango/0 transition-colors ease-in-out duration-500">
 				<div className={`flex w-full items-center gap-2`}>
 					<div className="aspect-square w-7 flex-shrink-0 relative">
 						<Image
@@ -72,15 +72,18 @@ export default function ArticleFeedCard({
 					</div>
 					<Link
 						href={`/${author?.username}`}
-						className={`text-sm text-gray-800 pt-1 hover:underline`}
+						className={`text-sm text-gray-800 pt-1 relative after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bg-black after:bottom-1 after:left-0 hover:after:scale-x-100 after:origin-right after:duration-500 after:transition-transform hover:after:origin-left`}
 					>
 						{author?.name}
 					</Link>
 				</div>
 
-				<Link href={`/article/${slug}`} className="py-3 block group">
+				<Link
+					href={`/article/${slug}`}
+					className="py-3 block group/text"
+				>
 					<div className="">
-						<h3 className="mb-2 text-2xl font-display-bold text-gray-800 line-clamp-2 group-hover:underline">
+						<h3 className="w-fit mb-2 text-2xl relative font-display-bold text-gray-800 line-clamp-2 after:absolute after:w-full after:scale-x-0 after:h-[2px] after:bg-black after:bottom-1 after:left-0 group-hover/text:after:scale-x-100 after:origin-right after:duration-500 after:transition-transform group-hover/text:after:origin-left">
 							{title}
 						</h3>
 						<p className="text-sm text-gray-800">

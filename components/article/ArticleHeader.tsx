@@ -11,6 +11,7 @@ import { useSession } from "@node_modules/next-auth/react";
 import LikeAnimation from "@public/assets/lottie/like-animation.json";
 import Lottie, { type LottieRefCurrentProps } from "lottie-react";
 import { useRouter } from "@node_modules/next/navigation";
+import { Slide, ToastContainer, toast } from "react-toastify";
 
 interface ArticleHeaderProps {
 	title: string;
@@ -64,8 +65,24 @@ export default function ArticleHeader({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [likesCount]);
 
+	const handleShareArticle = () => {
+		const url = window.location.href;
+		navigator.clipboard.writeText(url);
+		toast.success("Copied to clipboard!");
+	};
+
 	return (
 		<div className="border-b-[1px] border-black pb-5 mb-5">
+			<ToastContainer
+				hideProgressBar={true}
+				draggable={true}
+				autoClose={1000}
+				pauseOnHover={false}
+				theme="colored"
+				transition={Slide}
+				closeOnClick={true}
+				position="top-right"
+			/>
 			<h1 className="text-4xl font-display-black mb-5">{title}</h1>
 			<div className="flex justify-between items-center">
 				<div className="flex items-center gap-2">
@@ -116,7 +133,11 @@ export default function ArticleHeader({
 							/>
 						</div>
 					</div>
-					<Share size={20} className="cursor-pointer relative z-10" />
+					<Share
+						onClick={handleShareArticle}
+						size={20}
+						className="cursor-pointer relative z-10"
+					/>
 					<Image
 						src={PDFIcon}
 						width={20}

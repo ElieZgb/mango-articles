@@ -5,10 +5,12 @@ import { useSignInRegisterModalState } from "@state/signInRegisterModals";
 import ProfileButton from "./buttons/ProfileButton";
 import Link from "@node_modules/next/link";
 import { useUsernamePopupState } from "@state/usernamePopup";
-import { useRouter } from "@node_modules/next/navigation";
+import { usePathname, useRouter } from "@node_modules/next/navigation";
+import clsx from "clsx";
 
 export default function Header() {
 	const { data: session, status: sessionStatus } = useSession();
+	const pathname = usePathname();
 	const { setData: setModalData } = useSignInRegisterModalState();
 	const { setData: setPopupData } = useUsernamePopupState();
 	const [doneFetching, setDoneFetching] = useState<boolean>(false);
@@ -65,8 +67,23 @@ export default function Header() {
 					<Link href="/">MangoArticles</Link>
 				</h1>
 				<div className="flex items-center gap-6 text-sm">
-					<Link href="/articles">Articles</Link>
-					<div onClick={handleWritePage} className="cursor-pointer">
+					<Link
+						href="/articles"
+						className={clsx(
+							pathname == "/articles" &&
+								"font-display-bold italic transition-all relative after:none after:bottom-[-6px] after:left-[50%] after:translate-x-[-50%] after:w-[5px] after:aspect-square after:bg-black after:rounded-full"
+						)}
+					>
+						Articles
+					</Link>
+					<div
+						onClick={handleWritePage}
+						className={clsx(
+							"cursor-pointer",
+							pathname.includes("/write") &&
+								"font-display-bold italic transition-all relative after:none after:bottom-[-6px] after:left-[50%] after:translate-x-[-50%] after:w-[5px] after:aspect-square after:bg-black after:rounded-full"
+						)}
+					>
 						Write
 					</div>
 					{!session?.user?.email && (
