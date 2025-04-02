@@ -1,11 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "@node_modules/next/navigation";
 import { Loader2 } from "lucide-react";
 import { signOut, useSession } from "@node_modules/next-auth/react";
 
 export default function DangerZone() {
-	const router = useRouter();
 	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [deleteAccountModal, setDeleteAccountModal] = useState(false);
 	const { data: sessionData } = useSession();

@@ -15,7 +15,7 @@ export default function Page() {
 	const { slug } = useParams();
 	const [article, setArticle] = useState<ArticleType | null>(null);
 	const [articleTitle, setArticleTitle] = useState<string | null>(null);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
+	// const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 	useEffect(() => {
 		const { id } = deslugify(slug as string);
@@ -29,10 +29,10 @@ export default function Page() {
 				data.blocks.find((b: ArticleBlock) => b.type === "title")
 					?.textValue || "Title";
 			setArticleTitle(title);
-			const img = data.blocks.find(
-				(b: ArticleBlock) => b.type === "image"
-			)?.imagePreview;
-			setImagePreview(img);
+			// const img = data.blocks.find(
+			// 	(b: ArticleBlock) => b.type === "image"
+			// )?.imagePreview;
+			// setImagePreview(img);
 		};
 
 		fetchArticle();
@@ -69,7 +69,7 @@ export default function Page() {
 
 					<ArticleBody
 						blocks={article.blocks}
-						imagePreview={imagePreview}
+						// imagePreview={imagePreview}
 					/>
 				</div>
 			</div>

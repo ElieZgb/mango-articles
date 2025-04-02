@@ -4,7 +4,7 @@ import Image from "@node_modules/next/image";
 import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "@node_modules/next/link";
-import { deslugify, slugify } from "@app/lib/slugify";
+import { deslugify } from "@app/lib/slugify";
 import { usePathname } from "@node_modules/next/navigation";
 import ProfilePlaceholder from "@public/assets/images/profile-placeholder.png";
 

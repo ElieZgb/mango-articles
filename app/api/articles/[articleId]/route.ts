@@ -1,5 +1,5 @@
 import { db } from "@app/lib/prisma";
-import type { ArticleBlock } from "@node_modules/.prisma/client";
+import { ArticleBlock } from "@node_modules/.prisma/client";
 import { NextRequest, NextResponse } from "@node_modules/next/server";
 
 export async function GET(
@@ -62,7 +62,10 @@ export async function PUT(
 			},
 			data: {
 				blocks: {
-					create: blocks.map(({ articleId, id, ...res }) => {
+					create: blocks.map((block: ArticleBlock) => {
+						// eslint-disable-next-line @typescript-eslint/no-unused-vars
+						const { articleId, id, ...res } = block;
+
 						return {
 							...res,
 							createdAt: new Date(),
