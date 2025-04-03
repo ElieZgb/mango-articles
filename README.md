@@ -12,6 +12,7 @@ This web project has the following:
 ## Tech Stack
 
 **Client:** NextJS (App Router), TanStack Query, TailwindCSS, TypeScrip
+<br>
 **Server:** PostgreSQL, Supabase, Prisma, ImageKit
 
 ## Local Setup Instructions
@@ -25,7 +26,9 @@ This web project has the following:
 The project is missing these features:
 
 **Pagination** for the articles in the feed page and profile page
+<br>
 **Keyboard navigations** for the users mentions after typing '@' when writing an article
+<br>
 **SEO** (did not worked on it yet)
 
 ## Screenshots
