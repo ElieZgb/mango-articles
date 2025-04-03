@@ -1,6 +1,6 @@
 # Mango Articles 🥭
 
-Deployment link: [mangoarticles.com](https://mango-articles.vercel.app/)
+Deployment link: [mangoarticles.com](https://mango-articles.vercel.app/) ;)
 
 This web project has the following:
 
