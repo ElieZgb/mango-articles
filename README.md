@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mango Articles 🥭
 
-## Getting Started
+Deployment link: [mangoarticles.com](https://mango-articles.vercel.app/)
 
-First, run the development server:
+This web project has the following:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+-   User authentication
+-   Read and write articles
+-   Profile page
+-   Delete account option
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Client:** NextJS (App Router), TanStack Query, TailwindCSS, TypeScrip
+**Server:** PostgreSQL, Supabase, Prisma, ImageKit
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local Setup Instructions
 
-## Learn More
+1. Run `npm install` to install the dependencies
+2. When complete run `npm run build` to build the project and then `npm run start` to open the server.
+3. Enjoy!
 
-To learn more about Next.js, take a look at the following resources:
+## Known limitations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project is missing these features:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Pagination** for the articles in the feed page and profile page
+**Keyboard navigations** for the users mentions after typing '@' when writing an article
+**SEO** (did not worked on it yet)
 
-## Deploy on Vercel
+## Screenshots
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+###### Home
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![Home](/public/assets/screenshots/home.png)
+
+###### Login/Signup
+
+![Login/Signup](/public/assets/screenshots/login-signup-modal.png)
+
+###### Feed
+
+![Feed](/public/assets/screenshots/articles-feed.png)
+
+###### Read Article
+
+![Article](/public/assets/screenshots/article.png)
+
+###### Write Article
+
+![Write Article](/public/assets/screenshots/write-article.png)
+
+###### Profile
+
+![Profile](/public/assets/screenshots/profile-page.png)
+
+###### Settings
+
+![Settings](/public/assets/screenshots/danger-zone.png)
+
+###### Loading Screen
+
+![Loading](/public/assets/screenshots/loading-articles.png)
