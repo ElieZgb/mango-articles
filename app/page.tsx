@@ -6,7 +6,7 @@ import Link from "@node_modules/next/link";
 export default function page() {
 	return (
 		<div className="text-3xl font-display-light h-[85vh] flex justify-center">
-			<div className="mx-16 max-w-[1192px] w-full flex gap-10 flex-col justify-center h-full relative">
+			<div className="mx-16 max-[500px]:mx-7 max-w-[1192px] w-full flex max-[500px]:gap-5 gap-10 flex-col justify-center h-full relative">
 				<div className="absolute -z-1 w-full max-w-[500px] aspect-square right-0">
 					<Image
 						src={MangoPreview}
@@ -15,17 +15,17 @@ export default function page() {
 						className="object-cover"
 					/>
 				</div>
-				<h1 className="font-logo text-8xl">
+				<h1 className="font-logo text-8xl max-[680px]:text-7xl">
 					Mango
 					<br />
 					stories & ideas
 				</h1>
-				<p className="text-2xl">
+				<p className="text-2xl max-[680px]:text-xl">
 					A place to read, write, and deepen your understanding
 				</p>
 				<Link
 					href="/articles"
-					className="w-fit text-xl bg-black px-11 py-2.5 rounded-full cursor-pointer text-white flex items-center justify-center transition-all hover:bg-mango hover:text-black"
+					className="w-fit text-xl max-[500px]:text-lg bg-black px-11 py-2.5 rounded-full cursor-pointer text-white flex items-center justify-center transition-all hover:bg-mango hover:text-black"
 				>
 					Start reading
 				</Link>

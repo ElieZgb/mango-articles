@@ -21,11 +21,10 @@ export default function List({
 	const [currentPage] = useState(0);
 
 	return (
-		<div className="mb-20">
+		<div className="mb-15">
 			{title && <h3 className="text-[#777] font-bold mb-1">{title}</h3>}
 			<div className="">
 				{list.map((article, index) => {
-					console.log(article);
 					const title =
 						article?.blocks?.find((block) => block.type == "title")
 							?.textValue || "Title";
@@ -33,12 +32,12 @@ export default function List({
 					return (
 						<div
 							key={index}
-							className="bg-mango/60 py-2 px-4 mb-2 rounded-sm flex items-end"
+							className="bg-mango/60 py-2 px-4 mb-2 rounded-sm flex items-start"
 						>
 							<span className="mr-2 font-logo text-lg">
 								{index + 1}.
 							</span>
-							<div className="mr-3 flex-1 hover:underline relative">
+							<div className="mr-3 flex-1 hover:underline relative top-1">
 								<Link
 									href={`/article/${slugify(
 										title,
@@ -49,7 +48,7 @@ export default function List({
 								{title}
 							</div>
 
-							<div className="text-sm relative bottom-[2px]">
+							<div className="text-sm relative top-[6px]">
 								{article.likes_count} ❤️
 							</div>
 						</div>

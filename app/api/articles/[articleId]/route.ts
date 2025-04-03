@@ -36,15 +36,12 @@ export async function PUT(
 	{ params }: { params: Promise<{ articleId: string }> }
 ) {
 	const { articleId } = await params;
-	console.log({ articleId });
 
 	const url = new URL(request.url);
 	const bodyParam = url.searchParams.get("body");
 
 	if (bodyParam) {
-		console.log({ articleId });
 		const { blocks } = await request.json();
-		console.log({ blocks });
 		await db.article.update({
 			where: {
 				id: articleId,

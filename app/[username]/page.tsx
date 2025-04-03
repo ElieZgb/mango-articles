@@ -156,11 +156,11 @@ export default function Page() {
 
 	return (
 		<div className="flex justify-center py-12">
-			<div className="mx-16 max-w-[800px] w-full">
+			<div className="mx-16 max-[500px]:mx-7 max-w-[800px] w-full">
 				{/* Profile picture section */}
 				<div className="flex flex-col mb-10">
 					<div className="flex items-center">
-						<div className="relative w-24 aspect-square mr-10">
+						<div className="relative max-sm:w-17 w-24 aspect-square max-sm:mr-5 mr-10">
 							<div className="w-full h-full bg-mango rounded-full overflow-hidden relative">
 								{uploadingImage && (
 									<div className="absolute flex items-center justify-center w-full h-full top-0 left-0 bg-black/60 z-10">
@@ -203,7 +203,7 @@ export default function Page() {
 								{nameEditable ? (
 									<input
 										ref={nameInputRef}
-										className="text-4xl font-display-medium mr-1 outline-none border-[1.5px] rounded-sm border-black pt-1 pl-2 max-w-[300px]"
+										className="max-sm:text-2xl text-4xl font-display-medium mr-1 outline-none border-[1.5px] rounded-sm border-black pt-1 pl-2 max-w-[300px]"
 										type="text"
 										value={nameInput || ""}
 										onChange={(e) =>
@@ -211,7 +211,7 @@ export default function Page() {
 										}
 									/>
 								) : (
-									<h3 className="text-4xl font-display-medium mr-1">
+									<h3 className="max-sm:text-2xl text-4xl font-display-medium mr-1">
 										{nameInput}
 									</h3>
 								)}
@@ -284,7 +284,7 @@ export default function Page() {
 						<div className="py-2">
 							{bioInput || (
 								<span className="text-[#777] italic">
-									No bio! Write a few lines about yourself.
+									No bio!
 								</span>
 							)}
 						</div>
@@ -292,7 +292,7 @@ export default function Page() {
 				</div>
 
 				{/* Statistics */}
-				<div className="flex gap-5 mb-10">
+				<div className="flex max-sm:gap-2 gap-5 mb-10">
 					<DigitsStatisticsCard
 						value={totalPosts}
 						label={"Total Posts"}

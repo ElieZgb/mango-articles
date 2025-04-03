@@ -68,7 +68,7 @@ export default function AuthenticationModal() {
 			/>
 			<div
 				className={clsx([
-					"relative w-[70%] max-w-[678px] bg-white modal_box_shadow",
+					"relative w-[70%] max-[700px]:w-[85%] max-[600px]:w-[92%] max-[500px]:w-[95%] max-w-[678px] bg-white modal_box_shadow",
 					modalState?.isOpen && "modal_content_fade_in",
 					!modalState?.isOpen && "modal_content_fade_out",
 				])}
@@ -132,7 +132,7 @@ const LoginUI = ({ setModalData, title }: FormProps) => {
 
 	return (
 		<div className="flex flex-col items-center w-[80%] mx-auto">
-			<h1 className="font-logo text-3xl mt-14 mb-16">
+			<h1 className="font-logo text-3xl max-[500px]:text-2xl mt-14 mb-16 max-[500px]:mb-8">
 				{title ? title : "Welcome Back."}
 			</h1>
 			<AuthProviderButton
@@ -173,7 +173,7 @@ const LoginUI = ({ setModalData, title }: FormProps) => {
 				/>
 			</form>
 
-			<p className="mt-9 mb-12">
+			<p className="mt-9 max-[500px]:mt-5 mb-12 max-[500px]:mb-6">
 				No account?{" "}
 				<button
 					onClick={() => setModalData({ isOpen: true, type: 2 })}
@@ -182,11 +182,11 @@ const LoginUI = ({ setModalData, title }: FormProps) => {
 					Create one
 				</button>
 			</p>
-			<p className="text-[#6B6B6B] text-sm mb-7">
+			<p className="text-[#6B6B6B] text-sm max-[500px]:text-xs mb-7 max-[500px]:mb-3">
 				Forgot email or trouble signing in?{" "}
-				<span className="underline">Get help</span>.
+				<span className="underline cursor-not-allowed">Get help</span>.
 			</p>
-			<p className="text-[#6B6B6B] text-sm text-center mb-12">
+			<p className="text-[#6B6B6B] text-sm max-[500px]:text-xs text-center mb-12">
 				Click “Sign in” to agree to Medium&apos;s Terms of Service and
 				acknowledge that Medium&apos;s Privacy Policy applies to you.
 			</p>
@@ -256,7 +256,7 @@ const RegisterUI = ({ setModalData, title }: FormProps) => {
 
 	return (
 		<div className="flex flex-col items-center w-[80%] mx-auto">
-			<h1 className="font-logo text-3xl mt-14 mb-16">
+			<h1 className="font-logo text-3xl max-[500px]:text-2xl mt-14 mb-16 max-[500px]:mb-8">
 				{title ? title : "Join Medium."}
 			</h1>
 			<AuthProviderButton
@@ -358,7 +358,7 @@ const RegisterUI = ({ setModalData, title }: FormProps) => {
 					Sign in
 				</button>
 			</p>
-			<p className="text-[#6B6B6B] text-sm text-center mb-12">
+			<p className="text-[#6B6B6B] text-sm text-center mb-12 max-[500px]:hidden">
 				Click “Sign up” to agree to Medium&apos;s Terms of Service and
 				acknowledge that Medium&apos;s Privacy Policy applies to you.
 			</p>

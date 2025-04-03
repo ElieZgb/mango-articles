@@ -36,20 +36,20 @@ export default function DangerZone() {
 	return (
 		<div className="mb-10 border border-red-800 rounded-sm relative">
 			{deleteAccountModal && (
-				<div className="absolute w-full h-full left-0 top-0 rounded-sm flex flex-col items-center justify-center bg-background">
-					<h3 className="text-xl font-display-medium">
+				<div className="absolute w-full h-full p-4 left-0 top-0 rounded-sm flex flex-col items-center justify-center bg-background">
+					<h3 className="text-xl font-display-medium text-center max-[500px]:text-base">
 						Are you sure you want to delete your account?
 					</h3>
-					<div className="flex gap-3 mt-5">
+					<div className="flex max-[500px]:flex-col gap-3 mt-5">
 						<button
 							onClick={() => setDeleteAccountModal(false)}
-							className="cursor-pointer px-5 py-1 rounded-lg font-display-medium bg-green-300 text-green-800"
+							className="cursor-pointer px-5 py-1 rounded-lg max-[500px]:text-sm font-display-medium bg-green-300 text-green-800"
 						>
 							Cancel
 						</button>
 						<button
 							onClick={handleDeleteAccount}
-							className={`cursor-pointer relative px-5 py-1 rounded-lg font-display-medium bg-red-300 ${
+							className={`cursor-pointer relative px-5 py-1 max-[500px]:text-sm rounded-lg font-display-medium bg-red-300 ${
 								deletingAccount
 									? "text-transparent"
 									: "text-red-800"

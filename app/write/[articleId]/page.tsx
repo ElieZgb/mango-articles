@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import type { BlockData } from "../page";
-import { useParams } from "@node_modules/next/navigation";
+import { redirect, useParams } from "@node_modules/next/navigation";
 import Block from "@components/block-editor/Block";
 import { Loader2, Plus, Send } from "lucide-react";
 import { useBlockTooltipState } from "@state/blockTooltipControl";
@@ -25,7 +25,7 @@ export default function Page() {
 		useSelectionFloatingToolbarState();
 	const [isPublishing, setIsPublishing] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const { data: sessionData } = useSession();
+	const { status: sessionStatus } = useSession();
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -34,7 +34,6 @@ export default function Page() {
 			const data = await response.json();
 			setBlocks(data.blocks);
 			setIsLoading(false);
-			console.log(data.blocks);
 		};
 
 		fetchArticle();
@@ -116,9 +115,6 @@ export default function Page() {
 			return;
 		}
 
-		if (sessionData && !sessionData.user.id)
-			return alert("You are nto signed in");
-
 		setIsPublishing(true);
 		try {
 			await fetch(`/api/articles/${articleId}?body=true`, {
@@ -138,6 +134,10 @@ export default function Page() {
 		}
 	};
 
+	if (sessionStatus == "unauthenticated") {
+		return redirect("/");
+	}
+
 	if (!blocks || isLoading)
 		return (
 			<div className="h-screen">
@@ -154,7 +154,7 @@ export default function Page() {
 
 	return (
 		<div className="flex justify-center">
-			<div className="mx-16 max-w-[900px] min-h-screen w-full py-10">
+			<div className="mx-16 max-[500px]:mx-7 max-[500px]:py-2 max-w-[900px] min-h-screen w-full py-10">
 				<BlockTooltipControl
 					blockId={tooltipState?.blockId || null}
 					position={tooltipState?.position || { x: null, y: null }}

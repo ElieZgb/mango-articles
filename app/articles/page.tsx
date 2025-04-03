@@ -30,7 +30,7 @@ export default function Page() {
 		return <div>Error: {error.message}</div>;
 	}
 
-	if (isLoading) {
+	if (isLoading || !data) {
 		return (
 			<div className="px-8 py-5">
 				<ArticleFeedCardSkeleton index={0} />
@@ -42,7 +42,7 @@ export default function Page() {
 
 	return (
 		<div className="px-8 py-5">
-			{data.total_articles?.map((article: DataState, index: number) => {
+			{data?.total_articles?.map((article: DataState, index: number) => {
 				const title =
 					article.blocks.find((block) => block.type == "title")
 						?.textValue || "Title";

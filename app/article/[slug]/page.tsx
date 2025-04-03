@@ -9,7 +9,7 @@ import AuthorSideBar from "@components/article/AuthorSideBar";
 import LoadingIcon from "@public/assets/icons/loading-icon.gif";
 import Image from "@node_modules/next/image";
 
-type ArticleType = Article & { author: User; blocks: ArticleBlock[] };
+export type ArticleType = Article & { author: User; blocks: ArticleBlock[] };
 
 export default function Page() {
 	const { slug } = useParams();
@@ -38,8 +38,6 @@ export default function Page() {
 		fetchArticle();
 	}, [slug]);
 
-	console.log({ singleArticlePage: article });
-
 	if (!article)
 		return (
 			<div className="h-screen">
@@ -56,10 +54,11 @@ export default function Page() {
 
 	return (
 		<div className="flex justify-center">
-			<div className="flex max-w-[1200px] w-full mx-16 py-11 min-h-screen gap-5">
+			<div className="flex max-w-[1200px] w-full mx-16 max-[500px]:mx-7 py-11 max-[500px]:py-7 min-h-screen gap-5">
 				<AuthorSideBar author={article.author} />
-				<div className="flex-1">
+				<div className="flex-1 min-w-[600px] max-[800px]:min-w-[unset]">
 					<ArticleHeader
+						article={article}
 						author={article.author}
 						title={articleTitle || "Title"}
 						likes={article.likes_count}

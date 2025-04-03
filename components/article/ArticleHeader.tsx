@@ -12,6 +12,9 @@ import LikeAnimation from "@public/assets/lottie/like-animation.json";
 import Lottie, { type LottieRefCurrentProps } from "lottie-react";
 import { useRouter } from "@node_modules/next/navigation";
 import { Slide, ToastContainer, toast } from "react-toastify";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ArticlePDF from "@components/pdf/ArticlePDF";
+import type { ArticleType } from "@app/article/[slug]/page";
 
 interface ArticleHeaderProps {
 	title: string;
@@ -19,6 +22,7 @@ interface ArticleHeaderProps {
 	updatedAt: Date;
 	likes: number;
 	articleID: string;
+	article: ArticleType;
 }
 
 export default function ArticleHeader({
@@ -27,6 +31,7 @@ export default function ArticleHeader({
 	updatedAt,
 	likes,
 	articleID,
+	article,
 }: ArticleHeaderProps) {
 	const { data: session, status: sessionStatus } = useSession();
 	const lottieRef = useRef<LottieRefCurrentProps>(null);
@@ -138,13 +143,7 @@ export default function ArticleHeader({
 						size={20}
 						className="cursor-pointer relative z-10"
 					/>
-					<Image
-						src={PDFIcon}
-						width={20}
-						height={20}
-						alt="PDF"
-						className="cursor-pointer"
-					/>
+					<DownloadPdfButton title={title} article={article} />
 					{sessionStatus === "authenticated" &&
 						session.user.email === author.email && (
 							<PenTool
@@ -160,3 +159,37 @@ export default function ArticleHeader({
 		</div>
 	);
 }
+
+const DownloadPdfButton = ({
+	article,
+	title,
+}: {
+	title: string;
+	article: ArticleType;
+}) => {
+	return (
+		<PDFDownloadLink
+			document={<ArticlePDF article={article} title={title} />}
+			fileName={`${title
+				.toLowerCase() // Convert to lowercase
+				.normalize("NFD") // Normalize accents (é → e)
+				.replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+				.replace(/[^a-z0-9\s-]/g, "") // Remove special characters (except spaces and hyphens)
+				.trim() // Remove extra spaces
+				.replace(/\s+/g, "_") // Replace spaces with hyphens
+				.replace(/_+/g, "_")}_article.pdf`}
+		>
+			{({ loading }) => (
+				<Image
+					src={PDFIcon}
+					width={20}
+					height={20}
+					alt="PDF"
+					className={`${
+						loading ? "cursor-progress" : "cursor-pointer"
+					}`}
+				/>
+			)}
+		</PDFDownloadLink>
+	);
+};

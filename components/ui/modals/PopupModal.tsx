@@ -89,9 +89,11 @@ export default function PopupModal() {
 			])}
 		>
 			<div className="absolute w-full h-full" onClick={closePopup} />
-			<div className="relative min-w-[400px] w-[50%] max-w-[500px] aspect-video flex flex-col justify-center gap-5 px-8 items-center bg-white rounded-sm modal_box_shadow border-[2px] border-mango">
-				<h3 className="text-4xl font-logo">Create username</h3>
-				<p className="text-center text-sm">
+			<div className="relative min-w-[400px] max-[450px]:min-w-[unset] max-[500px]:w-[90%] w-[50%] max-w-[500px] flex flex-col justify-center gap-5 px-8 py-8 items-center bg-white rounded-sm modal_box_shadow border-[2px] border-mango">
+				<h3 className="text-4xl max-[500px]:text-2xl font-logo">
+					Create username
+				</h3>
+				<p className="text-center text-sm max-[360px]:text-xs">
 					Pick a username for your new account.
 					<br />
 					Make it stand out! You can&apos;t change it later.

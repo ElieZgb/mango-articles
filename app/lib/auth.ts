@@ -124,8 +124,6 @@ export const authOptions: AuthOptions = {
 					where: { email: user.email },
 				});
 
-				console.log("existingUser", existingUser);
-
 				if (existingUser) {
 					// Link the account to the existing user
 					await db.account.upsert({

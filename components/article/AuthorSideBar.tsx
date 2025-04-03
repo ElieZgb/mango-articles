@@ -29,7 +29,7 @@ export default function AuthorSideBar({ author }: { author: User }) {
 	}, [author, pathname]);
 
 	return (
-		<div className="sticky top-22 self-start max-w-[200px] w-full">
+		<div className="sticky top-22 self-start max-w-[200px] w-full max-[800px]:hidden">
 			{/* author details  */}
 			<div className="bg-white p-4 rounded-sm">
 				<div className="flex items-center gap-[6px] mb-3 relative">

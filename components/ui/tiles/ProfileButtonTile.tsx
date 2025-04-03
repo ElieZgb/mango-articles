@@ -1,6 +1,7 @@
 import React, { ForwardRefExoticComponent, RefAttributes } from "react";
 import { LucideProps } from "@node_modules/lucide-react/dist/lucide-react";
 import Link from "@node_modules/next/link";
+import clsx from "clsx";
 
 interface ProfileButtonTileProps {
 	label: string;
@@ -11,6 +12,7 @@ interface ProfileButtonTileProps {
 	onclick?: () => void;
 	rawHTML?: boolean;
 	closeMenu?: () => void;
+	className?: string;
 }
 
 export default function ProfileButtonTile({
@@ -20,10 +22,14 @@ export default function ProfileButtonTile({
 	onclick,
 	rawHTML = false,
 	closeMenu,
+	className,
 }: ProfileButtonTileProps) {
 	return (
 		<div
-			className="relative flex flex-row gap-3 items-center py-1.5 px-5 cursor-pointer group"
+			className={clsx(
+				"relative flex flex-row gap-3 items-center py-1.5 px-5 cursor-pointer group",
+				className
+			)}
 			onClick={onclick || undefined}
 		>
 			{url && (

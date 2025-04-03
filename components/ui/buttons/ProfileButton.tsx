@@ -78,7 +78,7 @@ const BurgerMenu = ({
 		<div
 			ref={menuRef}
 			className={clsx([
-				"absolute top-[120%] z-50 right-0 py-3 w-fit bg-[#f1f1f1] rounded-sm shadow-[0_3px_10px_rgb(0,0,0,0.2)] transition-all duration-[3000ms]",
+				"absolute top-[120%] z-50 right-0 py-3 w-max bg-[#f1f1f1] rounded-sm shadow-[0_3px_10px_rgb(0,0,0,0.2)] transition-all duration-[3000ms]",
 				active && "opacity-100 visible",
 				!active && "opacity-0 invisible",
 			])}
@@ -110,7 +110,7 @@ const BurgerMenu = ({
 			<ProfileButtonTile
 				label={`Sign out<br/>${session?.user.email}`}
 				rawHTML={true}
-				onclick={signOut}
+				onclick={() => signOut({ callbackUrl: "/" })}
 			/>
 		</div>
 	);

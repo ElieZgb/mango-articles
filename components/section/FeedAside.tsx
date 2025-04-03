@@ -30,9 +30,9 @@ export default function FeedAside() {
 	}
 
 	return (
-		<aside className="max-[900px]:hidden w-[30vw] min-w-[250px] max-w-[400px] border-l-[1px] border-black py-5 px-5">
+		<aside className="max-[900px]:w-full w-[30vw] min-w-[250px] max-[900px]:max-w-none max-w-[400px] border-l-[1px] border-black py-5 max-[900px]:px-8 px-5">
 			<h1 className="text-lg mb-2">Popular Articles</h1>
-			{data.popular_articles?.map(
+			{data?.popular_articles?.map(
 				(
 					article: Article & { blocks: ArticleBlock[]; author: User },
 					index: number
@@ -41,7 +41,6 @@ export default function FeedAside() {
 						article.blocks.find((block) => block.type == "title")
 							?.textValue || "Title";
 
-					console.log(article);
 					return (
 						<AsideCard
 							key={index}

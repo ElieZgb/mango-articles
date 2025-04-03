@@ -51,7 +51,18 @@ export default function Block({
 				blockId: id,
 			});
 
-			blockRef.current.innerHTML = textValue;
+			if (blockRef.current instanceof HTMLDivElement) {
+				if (textValue.length > 0) {
+					blockRef.current.style.height = "unset";
+				}
+				blockRef.current.innerHTML = textValue;
+			} else if (blockRef.current instanceof HTMLTextAreaElement) {
+				if (textValue.length > 0) {
+					blockRef.current.style.height = "auto";
+				}
+				blockRef.current.value = textValue;
+			}
+
 			if (textValue.length > 0 && labelRef.current)
 				labelRef.current.style.display = "none";
 		}
@@ -94,7 +105,9 @@ export default function Block({
 			<div
 				className={clsx(
 					"flex my-2 w-full relative",
-					type == "title" ? "text-5xl" : "text-xl",
+					type == "title"
+						? "text-5xl max-[500px]:text-4xl"
+						: "text-xl max-[700px]:text-lg max-[500px]:text-base max-[400px]:text-sm",
 					className
 				)}
 			>
@@ -110,6 +123,12 @@ export default function Block({
 					ref={blockRef as React.Ref<HTMLDivElement>}
 					contentEditable={true}
 					onMouseUp={handleSelection}
+					onPaste={(e) => {
+						if (blockRef.current) {
+							const text = e.clipboardData.getData("text/plain");
+							blockRef.current.innerHTML += text;
+						}
+					}}
 					className={clsx(
 						"bg-transparent font-display-regular outline-none flex-1 p-1 relative top-1",
 						type == "title" ? "h-[55px]" : "h-[36px]"
@@ -217,7 +236,7 @@ export default function Block({
 					/>
 					<button
 						onClick={handleDeleteBlock}
-						className="absolute bottom-5 left-5 invisible rounded-full bg-white p-3 border-[1.5px] cursor-pointer group-hover:visible shadow-2xl"
+						className="absolute bottom-5 left-5 invisible max-[500px]:visible rounded-full bg-white p-3 border-[1.5px] cursor-pointer group-hover:visible shadow-2xl"
 					>
 						<Trash2 size={25} />
 					</button>
@@ -241,7 +260,7 @@ export default function Block({
 				</div>
 				<button
 					onClick={handleDeleteBlock}
-					className="rounded-full p-3 invisible cursor-pointer border-[1.5px] bg-white absolute left-5 top-[50%] translate-y-[-50%] group-hover:visible shadow-2xl"
+					className="rounded-full p-3 invisible max-[500px]:visible cursor-pointer border-[1.5px] bg-white absolute left-5 top-[50%] translate-y-[-50%] group-hover:visible shadow-2xl"
 				>
 					<Trash2 size={20} className="" />
 				</button>
@@ -253,7 +272,7 @@ export default function Block({
 		return (
 			<div
 				className={clsx(
-					"flex flex-col my-2 w-full relative text-lg",
+					"flex flex-col my-2 w-full relative text-lg max-[700px]:text-lg max-[500px]:text-base max-[400px]:text-sm",
 					className
 				)}
 			>
@@ -436,7 +455,7 @@ export default function Block({
 						</div>
 						<button
 							onClick={handleDeleteBlock}
-							className="absolute bottom-24 left-5 invisible rounded-full bg-white p-3 border-[1.5px] cursor-pointer group-hover:visible shadow-2xl"
+							className="absolute bottom-24 left-5 invisible max-[500px]:visible rounded-full bg-white p-3 border-[1.5px] cursor-pointer group-hover:visible shadow-2xl"
 						>
 							<Trash2 size={25} />
 						</button>

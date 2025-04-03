@@ -37,6 +37,11 @@ export default function BlockTooltipControl({
 	// const { visible, position, blockId } = tooltip;
 	const [options, setOptions] = useState<boolean>(false);
 	const imageInputRef = useRef<HTMLInputElement | null>(null);
+	const [windowSize, setWindowSize] = useState({
+		width: window.innerWidth,
+		height: window.innerHeight,
+	});
+	const [positionStyles, setPositionStyles] = useState({ top: 0, left: 0 });
 
 	const addImage = () => {
 		if (imageInputRef.current) {
@@ -74,7 +79,43 @@ export default function BlockTooltipControl({
 
 	useEffect(() => {
 		setOptions(false);
+
+		if (position.x && position.y) {
+			if (windowSize.width >= 0 && windowSize.width < 500) {
+				setPositionStyles({
+					top: position.y - ICON_SIZE / 2,
+					left: position.x - ICON_SIZE * 0.97,
+				});
+			} else if (windowSize.width >= 500 && windowSize.width < 1055) {
+				setPositionStyles({
+					top: position.y - ICON_SIZE / 2,
+					left: position.x - ICON_SIZE * 1.5,
+				});
+			} else {
+				setPositionStyles({
+					top: position.y - ICON_SIZE / 2,
+					left: position.x - ICON_SIZE * 2.5,
+				});
+			}
+		} else {
+			setPositionStyles({ top: 0, left: 0 });
+		}
 	}, [visible, position]);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
 
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setData({ visible: false });
@@ -108,17 +149,23 @@ export default function BlockTooltipControl({
 
 	return (
 		<div
-			className="absolute flex items-center gap-1"
-			style={{
-				top: position.y ? position.y - ICON_SIZE / 2 : 0,
-				left: position.x ? position.x - ICON_SIZE * 2.5 : 0,
-			}}
+			className="absolute flex items-center max-[1055px]:flex-col gap-1"
+			style={positionStyles}
 		>
 			<div
 				onClick={handleDeleteBlock}
 				className={`aspect-square cursor-pointer rounded-full flex items-center justify-center transition-transform `}
 			>
-				<Trash2 strokeWidth={1.3} size={ICON_SIZE} />
+				<Trash2
+					strokeWidth={1.3}
+					size={ICON_SIZE}
+					className="max-[500px]:hidden"
+				/>
+				<Trash2
+					strokeWidth={1.3}
+					size={ICON_SIZE * 0.9}
+					className="max-[500px]:block hidden"
+				/>
 			</div>
 
 			<div
@@ -127,7 +174,16 @@ export default function BlockTooltipControl({
 					options ? "rotate-45" : ""
 				}`}
 			>
-				<PlusCircle strokeWidth={1.3} size={ICON_SIZE} />
+				<PlusCircle
+					strokeWidth={1.3}
+					size={ICON_SIZE}
+					className="max-[500px]:hidden"
+				/>
+				<PlusCircle
+					strokeWidth={1.3}
+					size={ICON_SIZE * 0.9}
+					className="max-[500px]:block hidden"
+				/>
 			</div>
 			<div
 				className={clsx(

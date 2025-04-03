@@ -83,7 +83,7 @@ export default function ArticleFeedCard({
 					className="py-3 block group/text"
 				>
 					<div className="">
-						<h3 className="w-fit mb-2 text-2xl relative font-display-bold text-gray-800 line-clamp-2 after:absolute after:w-full after:scale-x-0 after:h-[2px] after:bg-black after:bottom-1 after:left-0 group-hover/text:after:scale-x-100 after:origin-right after:duration-500 after:transition-transform group-hover/text:after:origin-left">
+						<h3 className="w-fit mb-2 max-[500px]:text-xl text-2xl relative font-display-bold text-gray-800 line-clamp-2 after:absolute after:w-full after:scale-x-0 after:h-[2px] after:bg-black after:bottom-1 after:left-0 group-hover/text:after:scale-x-100 after:origin-right after:duration-500 after:transition-transform group-hover/text:after:origin-left">
 							{title}
 						</h3>
 						<p className="text-sm text-gray-800">

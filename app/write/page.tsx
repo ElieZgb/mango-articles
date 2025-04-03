@@ -10,10 +10,11 @@ import { useBlockTooltipState } from "@state/blockTooltipControl";
 import { useSelectionFloatingToolbarState } from "@state/selectionFloatingToolbar";
 import { useSession } from "@node_modules/next-auth/react";
 import clsx from "clsx";
-import { useRouter } from "@node_modules/next/navigation";
+import { redirect, useRouter } from "@node_modules/next/navigation";
 import { useUploadImage } from "@app/lib/uploadImage";
+import { ArticleBlock } from "@node_modules/.prisma/client";
 
-export interface BlockData {
+export interface BlockData extends Partial<ArticleBlock> {
 	id: string;
 	type: "text" | "title" | "image" | "separator" | "codeblock" | "videolink";
 	textValue: string;
@@ -40,7 +41,7 @@ export default function Page() {
 			textValue: "",
 		},
 	]);
-	const { data: sessionData } = useSession();
+	const { data: sessionData, status: sessionStatus } = useSession();
 	const [isPublishing, setIsPublishing] = useState<boolean>(false);
 
 	const updateBlock = (
@@ -123,7 +124,6 @@ export default function Page() {
 			return;
 		}
 
-		console.log("publishing...");
 		setIsPublishing(true);
 
 		const updatedBlocks = await Promise.all(
@@ -135,7 +135,11 @@ export default function Page() {
 							folder: "/previews",
 						});
 						return {
-							...block,
+							id: block.id,
+							type: block.type,
+							textValue: block.textValue,
+							createdAt: block.createdAt,
+							updatedAt: block.updatedAt,
 							imagePreview: imageUrl,
 						};
 						// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -159,8 +163,7 @@ export default function Page() {
 					authorId: sessionData?.user.id,
 				}),
 			});
-			const data = await res.json();
-			console.log(data);
+			await res.json();
 			router.push("/articles");
 		} catch (e) {
 			console.log("Error publishing", e);
@@ -172,9 +175,13 @@ export default function Page() {
 		}
 	};
 
+	if (sessionStatus == "unauthenticated") {
+		return redirect("/");
+	}
+
 	return (
 		<div className="flex justify-center">
-			<div className="mx-16 max-w-[900px] min-h-screen w-full py-10">
+			<div className="mx-16 max-[500px]:mx-7 max-w-[900px] min-h-screen w-full py-10">
 				<BlockTooltipControl
 					blockId={tooltipState?.blockId || null}
 					position={tooltipState?.position || { x: null, y: null }}
