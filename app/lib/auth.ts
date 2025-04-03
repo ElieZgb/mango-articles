@@ -7,13 +7,12 @@ import type { AuthOptions } from "@node_modules/next-auth";
 import { PrismaAdapter } from "@node_modules/@next-auth/prisma-adapter";
 import { db } from "@app/lib/prisma";
 import bcrypt from "bcrypt";
-import { Adapter } from "@node_modules/next-auth/adapters";
 
 export const authOptions: AuthOptions = {
 	session: {
 		strategy: "jwt",
 	},
-	adapter: PrismaAdapter(db) as Adapter,
+	adapter: PrismaAdapter(db),
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -120,7 +119,7 @@ export const authOptions: AuthOptions = {
 			// console.log("User:", user);
 
 			if (user.email && account) {
-				const existingUser = await prisma.user.findUnique({
+				const existingUser = await db.user.findUnique({
 					where: { email: user.email },
 				});
 
